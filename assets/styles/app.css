@@ -1,0 +1,250 @@
+ @font-face {
+  font-family: 'Virnature';
+  src: url('/fonts/Virnature-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+ @font-face {
+  font-family: 'Virnature';
+  src: url('/fonts/Mollani-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.welcome-text {
+  font-size: 22px;      
+  font-weight: bold;     
+  padding: 15px 0;       
+  text-align: center;    
+  color: #1D4A23;       
+}
+
+.tagline {
+  font-family: 'Virnature', sans-serif; 
+  font-size: 15px;
+  color: #2e5339;  
+  font-style: italic;
+}
+
+.logoword {
+  font-family: 'Mollani', sans-serif;
+  font-size: 30px;
+  padding: 10px;
+  color: #2e5339;
+}
+ 
+ 
+ body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #ffffff; 
+      color: #333;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #F5F5DC; 
+      color: #1D4A23;
+      height: 100vh;
+      padding: 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      box-sizing: border-box;
+    }
+
+    .sidebar a {
+  display: flex;           
+  align-items: center;     
+  gap: 10px;              
+  color: #1D4A23;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 8px 0;
+}
+
+.sidebar a i {
+  min-width: 20px;         
+  font-size: 16px;         
+}
+
+  .sidebar .logo {
+  width: 100%;          
+  max-width: 200px;     
+  display: block;       
+  margin: 0 auto 30px;  
+}
+
+    
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #1D4A23;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 8px 0;
+    }
+
+    .sidebar a:hover {
+      background-color: #99CC67; 
+      color: black;
+    }
+
+
+    .main {
+      margin-left: 240px;
+      padding: 20px;
+      flex: 1;
+    }
+
+    header {
+      background-color: #F5F5DC; 
+      color: #1D4A23;
+      padding: 15px;
+      
+      font-size: 25px;
+      font-weight: bold;
+      border-radius: 20px;
+
+
+  display: flex;                     
+  justify-content: space-between;   
+  align-items: center;
+}
+
+.welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 15px; 
+}
+
+.welcome-header h2 {
+  font-size: 28px;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Search input */
+.header-right .search {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid #4b7f34;  /* light eco green */
+  outline: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background-color: #f9fff5;   /* soft off-white background */
+}
+
+.header-right .search:focus {
+  border-color: #4b7f34;
+  box-shadow: 0 0 6px rgba(75, 127, 52, 0.4);
+}
+
+.header-right .logout {
+  padding: 8px 14px;
+  border: none;
+  background-color: #4b7f34; 
+  color: white;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.header-right .logout:hover {
+  background-color: #6F4E37;
+}
+
+
+.logout {
+  background-color: #99CC67; 
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+     .container {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /*columns*/
+  grid-gap: 15px;
+}
+
+.card {
+  padding: 30px;
+  background-color: #99CC67;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/*.card:nth-child(3) {
+ height: 30px;
+  font-size: 18px; */
+
+
+
+/* Special layout */
+.card:nth-child(1) { grid-column: 1; } /* Total Orders left */
+.card:nth-child(2) { grid-column: 2; } /* Sales Today right */
+.card:nth-child(3) { grid-column: 1 / span 2; } /* New Reviews spans both columns */
+.card:nth-child(4) { grid-column: 1; } /* Coupons Redeemed left */
+.card:nth-child(5) { grid-column: 2; } /* Top-Selling Item right */
+
+    .row {
+      display: flex;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .panel {
+      flex: 1;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .brown { background-color: #6F4E37; }  /* Coffee brown */
+    .green { background-color: #99CC67; color: black; }
+    .dark-green { background-color: #1D4A23; }
+
+    .footer {
+      background-color: #1D4A23;
+      text-align: center;
+      padding: 10px;
+      font-weight: bold;
+      margin-top: 20px;
+      border-radius: 8px;
+      color: rgb(253, 233, 233);
+    }
