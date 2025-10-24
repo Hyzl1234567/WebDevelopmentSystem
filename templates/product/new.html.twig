@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Product{% endblock %}
+
+{% block body %}
+
+<style>
+    body {
+        background-color: #99CC67; 
+        font-family: Arial, sans-serif;
+    }
+
+.readonly-field {
+    background-color: #f4f4f4;
+    color: #555;
+    border: 1px solid #ccc;
+    cursor: not-allowed;
+}
+
+    .form-container h1 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #1D4A23;
+        text-align: center;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        color: #1D4A23;
+    }
+
+.form-container input,
+.form-container select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #99CC67;   /* match your green border */
+  border-radius: 8px;
+  background: #f9fff5;         /* light greenish background */
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  transition: 0.3s;
+  appearance: none;            /* remove default browser style */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Focus effect */
+.form-container input:focus,
+.form-container select:focus {
+  border-color: #6b4226;
+  box-shadow: 0 0 5px rgba(107, 66, 38, 0.4);
+  background: #fff; /* turn pure white on focus */
+}
+
+
+/* Style for text, number, file, textarea, and select */
+form input[type="text"],
+form input[type="number"],
+form input[type="file"],
+form textarea,
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #99CC67;    
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;      
+    color: #333;
+}
+
+    form input[type="text"],
+    form input[type="number"],
+    form input[type="file"],
+    form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #99CC67;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+   
+   /* Container */
+.form-container {
+  width: 600px;
+  margin: 40px auto;
+  padding: 25px;
+  border: 2px solid white;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0,0,0,1);
+  font-family: Arial, sans-serif;
+}
+
+/* Heading */
+.form-container h2 {
+  text-align: center;
+  color: #6b4226; 
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Labels */
+.form-container label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #3c2f2f;
+}
+
+/* Inputs */
+.form-container input,
+.form-container select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: 0.3s;
+}
+
+/* Focus effect */
+.form-container input:focus,
+.form-container select:focus {
+  border-color: #6b4226;
+  box-shadow: 0 0 5px rgba(107, 66, 38, 0.4);
+}
+ 
+/* Back button */
+.back-btn {
+  background: #99CC67;
+  color: black;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background: #6F4E37;
+  color: #fff;
+}
+
+/* Save button */
+.save-btn {
+  background: #1D4A23;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+
+.save-btn:hover {
+  background: #99CC67;
+  color:black;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between; /* Back left, Save right */
+  align-items: center;             /* keep them on same vertical line */
+  margin-top: 20px;
+}
+
+</style>
+
+  <div class="form-container">
+        <h2>Add New Product</h2>
+
+        {{ include('product/_form.html.twig') }}
+
+        
+    
+{% endblock %}

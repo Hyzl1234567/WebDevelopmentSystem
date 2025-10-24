@@ -1,0 +1,504 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<style> 
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fff;
+}
+
+.dashboard-container {
+  display: flex;
+}
+
+ /* Sidebar Container */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 80px;
+    height: 100vh;
+    background-color: #2d4d22;
+    color: white;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Hover to expand */
+.sidebar:hover {
+    width: 220px;
+}
+
+/* Navigation List */
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 100px;
+    width: 100%;
+}
+
+/* Individual Links */
+.nav-list li {
+    width: 100%;
+}
+
+.nav-list a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    transition: background 0.2s;
+}
+
+/* Icons */
+.nav-list i {
+    font-size: 20px;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* Text label (hidden by default) */
+.nav-text {
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Show text on hover */
+.sidebar:hover .nav-text {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hover effect */
+.nav-list a:hover {
+    background-color: #99CC67;
+    border-radius: 8px;
+}
+
+/* Active link (optional) */
+.nav-list a.active {
+    background-color: #4e8744;
+}
+
+/* Ensure main content doesn’t overlap */
+.content {
+    margin-left: 80px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar:hover ~ .content {
+    margin-left: 220px;
+}
+
+/* Layout container */
+.layout {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+ /* Sidebar base */
+.sidebar {
+    width: 70px;
+    background-color: #2d4d22;
+    color: white;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Hover expansion */
+.sidebar:hover {
+    width: 200px;
+}
+
+/* Sidebar list */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+/* Sidebar list items */
+.sidebar ul li {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s, padding-left 0.2s;
+}
+
+.sidebar ul li:hover {
+    background-color: #3b5b2a;
+    padding-left: 20px;
+}
+
+/* Sidebar links */
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    font-size: 15px;
+    width: 100%;
+}
+
+/* Sidebar icons */
+.sidebar ul li i {
+    font-size: 18px;
+    min-width: 22px;
+    text-align: center;
+}
+
+/* Sidebar labels */
+.sidebar ul li span {
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+    font-size: 14px;
+}
+
+.sidebar:hover ul li span {
+    opacity: 1;
+}
+
+
+/* Main content */
+.main-content {
+    flex: 1;
+    margin-left: 70px; /* same as sidebar width */
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease;
+}
+
+/* When sidebar expands */
+.sidebar:hover ~ .main-content {
+    margin-left: 200px;
+}
+
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 20px 40px;
+    border-bottom: 2px solid #d3d3d3;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 900;
+    position: sticky;
+    top: 0;
+}
+
+.header .logo h1 {
+    margin: 0;
+    color: #2d4d22;
+    font-family: 'Poppins', sans-serif;
+}
+
+.header .logo p {
+    margin: 0;
+    font-size: 14px;
+    color: #4f7041;
+}
+
+.search-logout {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-logout input {
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.logout {
+    background-color: #2d4d22;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.logout:hover {
+    background-color: #3b5b2a;
+}
+
+/* Page content */
+.content {
+    padding: 30px;
+    background: #fff;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+
+/* Main area */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #ffffe3;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h1 {
+  margin: 0;
+  color: #1D4A23;
+}
+
+.search-logout input {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #99CC67;
+}
+
+.logout {
+  background: #1D4A23;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+/* Buttons */
+.btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: white;
+  margin: 2px;
+}
+
+.btn-show {
+  background: #6F4E37;
+}
+
+.btn-edit {
+  background: #1D4A23;
+}
+
+.btn-add {
+  background: #99CC67;
+  color: black;
+}
+
+.logo img.logo-img {
+    height: 80px; /* adjust as needed */
+    width: auto;
+    display: block;
+}
+
+.search-logout {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-logout form {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.search-logout input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #234d20;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.search-btn {
+    background-color: #234d20;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-btn:hover {
+    background-color: #2e6b2e;
+}
+
+.search-btn i {
+    font-size: 14px;
+}
+
+
+.system-banner {
+    color: #2e6b2e;
+    text-align: center;
+    padding: 14px 0;
+   
+}
+
+.system-banner h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin: 0;
+    color: #2e6b2e;
+    text-shadow: 1px 1px 3px rgba(8, 124, 61, 0.3);
+    animation: fadeInDown 1s ease;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+</style>
+
+
+<body>
+    <div class="dashboard-container">
+     <!-- Sidebar -->
+<aside class="sidebar">
+    <ul class="nav-list">
+    
+        <li>
+            <a href="{{ path('app_dashboard') }}">
+                <i class="fas fa-home"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_product_index') }}">
+                <i class="fas fa-mug-hot"></i>
+                <span class="nav-text">Products</span>
+            </a>
+        </li>
+         <li>
+            <a href="{{ path ('app_stock_index')}}">
+                <i class="fas fa-boxes"></i>
+                <span class="nav-text">Stocks</span>
+            </a>
+        </li>
+        <li>
+           <a href="{{ path('app_order') }}">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="nav-text">Orders</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="{{ path('app_sales_index') }}">
+                <i class="fas fa-chart-line"></i>
+                <span class="nav-text">Sales</span>
+            </a>
+        </li>
+            <li>
+    <a href="{{ path('app_category_index') }}">
+        <i class="fas fa-tags"></i>
+        <span class="nav-text">Categories</span>
+    </a>
+</li>
+        <li>
+            <a href="#">
+                <i class="fas fa-star"></i>
+                <span class="nav-text">Reviews</span>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="fas fa-ticket-alt"></i>
+                <span class="nav-text">Coupons</span>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="fas fa-bell"></i>
+                <span class="nav-text">Notifications</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+
+
+        <!-- Main content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+
+            <div class="logo">
+    <img src="{{ asset('image/Logo_Brand.png') }}" alt="EcoBrew Logo" class="logo-img">
+</div>
+
+<div class="system-banner">
+    <h2>☕ Review-to-Coupon Ordering System 🌿</h2>
+</div>
+
+  <div class="search-logout">
+    <form method="get" action="{{ path('app_stock_index') }}" class="search-form">
+        <input type="text" name="q" placeholder="Search Product..." value="{{ app.request.get('q') }}">
+         <button type="submit" class="search-btn">
+    <i class="fas fa-search"></i>
+</button>
+    </form>
+
+    <form action="{{ path('app_logout') }}" method="post" onsubmit="return confirm('⚠Are you sure you want to log out?');">
+        <button type="submit" class="logout">Logout</button>
+    </form>
+</div>
+
+
+
+
+        </header>
+
+        <!-- Page content -->
+        <section class="content">
+            {% block body %}{% endblock %}
+        </section>
+    </main>
+</div>
+
+</body>
+</html>

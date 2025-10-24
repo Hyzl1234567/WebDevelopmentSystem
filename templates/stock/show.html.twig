@@ -1,0 +1,158 @@
+ {% extends 'base.html.twig' %}
+
+{% block title %}Stock{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: #99CC67;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .stock-show-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Image left, details right */
+        gap: 20px;
+        max-width: 900px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        overflow: hidden;
+    }
+
+    /* Left column - Product image */
+    .stock-left {
+        background: #fdf5e6; /* creamy yellow tone */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .stock-left img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 8px;
+    }
+
+    /* Right column - Stock details */
+    .stock-right {
+        padding: 30px;
+        text-align: left;
+    }
+
+    .stock-right h2 {
+        font-size: 1.8rem;
+        color: #1f4e25;
+        margin-bottom: 15px;
+    }
+
+    .stock-details p {
+        margin: 10px 0;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .stock-details strong {
+        color: #1f4e25;
+        min-width: 120px;
+        display: inline-block;
+    }
+
+    .product-name {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #234d20;
+        margin-bottom: 10px;
+    }
+
+    .product-info {
+        font-size: 0.95rem;
+        color: #333;
+    }
+
+    /* Buttons */
+    .stock-actions {
+        margin-top: 25px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .stock-actions .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .back-btn {
+        background: #f5f5f5;
+        color: #000;
+    }
+    .back-btn:hover {
+        background: #6F4E37;
+        color: white;
+    }
+
+    .edit-btn {
+        background: #e8f5e9;
+        color: #000;
+    }
+    .edit-btn:hover {
+        background: #1D4A23;
+        color: white;
+    }
+
+
+form button.btn {
+    background: #f8d7da;
+    color: #000;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+form button.btn:hover {
+    background: #c9302c;
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(201, 48, 44, 0.4);
+}
+
+    
+</style>
+
+<div class="stock-show-container">
+    <div class="stock-left">
+        {% if stock.product.image %}
+            <img src="{{ asset('uploads/images/' ~ stock.product.image) }}" alt="{{ stock.product.name }}">
+        {% else %}
+            <em>No image available</em>
+        {% endif %}
+    </div>
+
+    <div class="stock-right">
+        <h2>Stock Information</h2>
+
+        <div class="stock-details">
+            <p><strong>ID:</strong> {{ stock.id }}</p>
+            <p><strong>Quantity:</strong> {{ stock.quantity }}</p>
+            <p><strong>Last Updated:</strong> {{ stock.lastUpdated ? stock.lastUpdated|date('Y-m-d H:i:s') : '' }}</p>
+            <p><strong>Product Name:</strong> {{ stock.product.name }}</p>
+        </div>
+
+        <div class="stock-actions">
+            <a href="{{ path('app_stock_index') }}" class="btn back-btn">⬅ Back</a>
+            <a href="{{ path('app_stock_edit', {'id': stock.id}) }}" class="btn edit-btn">✏ Edit</a>
+            {{ include('stock/_delete_form.html.twig', { 'button_class': 'btn delete-btn' }) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

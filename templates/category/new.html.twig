@@ -1,0 +1,118 @@
+ {% extends 'base.html.twig' %}
+
+{% block title %}New Category{% endblock %}
+
+{% block body %}
+
+<style>
+    body {
+        background-color: #99CC67; 
+        font-family: Arial, sans-serif;
+    }
+
+    /* Container */
+    .form-container {
+        width: 600px;
+        margin: 40px auto;
+        padding: 25px;
+        border: 2px solid white;
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0,0,0,1);
+        font-family: Arial, sans-serif;
+    }
+
+    /* Heading */
+    .form-container h2 {
+        text-align: center;
+        color: #1D4A23; 
+        margin-bottom: 20px;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    /* Labels */
+    form label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        color: #1D4A23;
+    }
+
+    /* Inputs */
+    form input[type="text"],
+    form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #99CC67;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #f9fff5;
+        color: #333;
+        outline: none;
+        transition: 0.3s;
+    }
+
+    /* Focus effect */
+    form input:focus,
+    form textarea:focus {
+        border-color: #6b4226;
+        box-shadow: 0 0 5px rgba(107, 66, 38, 0.4);
+        background: #fff;
+    }
+
+    /* Buttons */
+    .form-buttons {
+        display: flex;
+        justify-content: space-between; /* Back left, Save right */
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .back-btn {
+        background: #99CC67;
+        color: black;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .back-btn:hover {
+        background: #6F4E37;
+        color: #fff;
+    }
+
+    .save-btn {
+        background: #1D4A23;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-weight: bold;
+    }
+
+    .save-btn:hover {
+        background: #99CC67;
+        color: black;
+    }
+</style>
+
+<div class="form-container">
+    <h2>Add New Category</h2>
+
+    {{ include('category/_form.html.twig') }}
+
+    <div class="form-buttons">
+        <a href="{{ path('app_category_index') }}" class="back-btn">Back to List</a>
+        <button type="submit" form="category_form" class="save-btn">Save</button>
+    </div>
+</div>
+
+{% endblock %}

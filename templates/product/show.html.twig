@@ -1,0 +1,253 @@
+ {% extends 'base.html.twig' %}
+
+{% block title %}Product{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: #99CC67; /* deep green background like in the sample */
+        font-family: 'Arial', sans-serif;
+    }
+
+    .product-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        display: flex;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 4px 20px rgba(0,0,0,1);
+    }
+
+    /* Left side: Image */
+    .product-image {
+        flex: 1;
+        background: #F5F5DC; /* soft yellow background */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .product-image img {
+        max-width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+    /* Right side: Info */
+    .product-info {
+        flex: 1;
+        padding: 40px;
+        background: #white; /* light pastel green */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .product-info h1 {
+        font-size: 32px;
+        color: black;
+        margin-bottom: 15px;
+    }
+
+    .product-description {
+        font-size: 16px;
+        line-height: 1.6;
+        color: black;
+        margin-bottom: 25px;
+    }
+
+    .product-details {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .detail {
+        display: flex;
+        align-items: left;
+        gap: 10px;
+        font-size: 15px;
+        color: #black;
+    }
+
+    .detail span {
+        font-weight: bold;
+       
+        padding: 4px 10px;
+        border-radius: 6px;
+        color: #1D4A23;
+        min-width: 100px;
+        text-align: left;
+    }
+
+    .price {
+        font-size: 40px;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .back-btn, .edit-btn, .delete-btn {
+        text-decoration: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .back-btn {
+        background:#f5f5f5;
+        color: black;
+    }
+    .back-btn:hover {
+        background: #6F4E37;
+        color: #fff;
+    }
+
+    .edit-btn {
+        background: #e8f5e9;
+        color: black;
+    }
+    .edit-btn:hover {
+        background: #1D4A23;
+        color: white;
+    }
+
+     .delete-btn {
+  
+    color: black;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+   }
+
+    .delete-btn:hover {
+    background: #c9302c;
+    color:white;
+   }
+
+.product-show-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Left = image, Right = details */
+    gap: 20px;
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+/* Left column */
+.product-left {
+    background: #fdf5e6; /* creamy white */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.product-left img {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+}
+
+/* Right column */
+.product-right {
+    padding: 25px;
+    text-align: left;
+}
+
+.product-right h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.product-right p {
+    margin: 6px 0;
+}
+
+.product-price {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+/* Buttons */
+.product-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.product-actions .btn {
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.back-btn {  color: black; }
+.edit-btn { color:black; }
+.delete-btn { color:black; }
+
+form button.btn {
+    background: #f8d7da;
+    color: #000;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+form button.btn:hover {
+    background: #c9302c;
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(201, 48, 44, 0.4);
+}
+
+</style>
+
+  <div class="product-show-container">
+    <div class="product-left">
+        {% if product.image %}
+            <img src="{{ asset('uploads/images/' ~ product.image) }}" alt="{{ product.name }}">
+        {% endif %}
+    </div>
+
+    <div class="product-right">
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description }}</p>
+        <p><strong>ID:</strong> {{ product.id }}</p>
+        <p><strong>Category:</strong> {{ product.category }}</p>
+        <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+        <p class="product-price">₱{{ product.price }}</p>
+
+        <div class="product-actions">
+            <a href="{{ path('app_product_index') }}" class="btn back-btn">⬅ Back</a>
+            <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn edit-btn">✏ Edit</a>
+            {{ include('product/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

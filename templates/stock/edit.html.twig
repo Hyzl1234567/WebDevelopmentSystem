@@ -1,0 +1,72 @@
+ {% extends 'base.html.twig' %}
+
+{% block title %}Edit Stock{% endblock %}
+
+{% block body %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #9ed36a;
+            margin: 0;
+            padding: 0;
+        }
+
+h1{
+text-align:center;
+}
+
+        .form-container {
+            background: #ffffff;
+            max-width: 420px;
+            margin: 60px auto;
+            padding: 35px 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+            text-align: left;
+        }
+
+        h1 {
+            color: #1f441e;
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .delete-form {
+            margin-top: 0;
+        }
+
+        .delete-form form {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .form-actions .back-link,
+        .form-actions .btn,
+        .delete-form button {
+            flex: 1;
+            margin: 0 5px;
+            text-align: center;
+        }
+    </style>
+
+    <div class="form-container">
+        <h1>Edit Stock</h1>
+        {{ include('stock/_form.html.twig', {'button_label': 'Update'}) }}
+
+        <div class="delete-form">
+            {{ include('stock/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

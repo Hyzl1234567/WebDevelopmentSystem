@@ -1,0 +1,66 @@
+
+ <style>
+    .form-container form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .form-container input,
+    .form-container select,
+    .form-container textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #fff;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-container input:focus,
+    .form-container select:focus,
+    .form-container textarea:focus {
+        border-color: #2d572c;
+        box-shadow: 0 0 6px rgba(45, 87, 44, 0.3);
+        outline: none;
+    }
+
+    /* Button Row */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .form-container button.btn,
+    .form-container .back-link {
+        background-color: #234d20;
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 15px;
+        transition: background-color 0.3s ease;
+    }
+
+    .form-container button.btn:hover,
+    .form-container .back-link:hover {
+        background-color: #2e6b2e;
+    }
+</style>
+
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+
+    <div class="form-actions">
+        <a href="{{ path('app_stock_index') }}" class="back-link">Back to list</a>
+        
+        <button class="btn">{{ button_label|default('Save') }}</button>
+    </div>
+
+    
+{{ form_end(form) }}

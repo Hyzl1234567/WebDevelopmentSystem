@@ -1,0 +1,7 @@
+ {{ form_start(form) }}
+    {{ form_widget(form) }}
+     <div class="form-buttons">
+        <a href="{{ path('app_product_index') }}" class="back-btn">Back</a>
+        <button type="submit" class="save-btn">Save</button>
+    </div>
+{{ form_end(form, { 'render_rest': false }) }}

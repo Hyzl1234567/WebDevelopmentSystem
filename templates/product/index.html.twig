@@ -1,0 +1,151 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block title %}Product index{% endblock %}
+
+{% block body %}
+
+
+<style>
+ 
+ body {
+        background-color: #fff; 
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,1);
+    }
+
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    th {
+        background: #1D4A23;
+        color: white;
+        padding: 10px;
+        text-align: left;
+    }
+
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tr:hover td {
+        background: #f9f9f9;
+    }
+
+    a.btn {
+        display: inline-block;
+        padding: 8px 12px;
+        margin-top: 15px;
+        background: #99CC67;
+        color: black;
+        border-radius: 5px;
+        text-decoration: none;
+        
+    }
+
+    a.btn:hover {
+        background: #1D4A23;
+        color:white;
+    }
+
+/* Action buttons */
+.btn-action {
+    display: inline-block;
+    padding: 6px 14px;
+    margin: 2px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+/* Show button */
+.btn-show {
+    background: #99CC67;
+    color: black;
+    border: 1px solid #99CC67;
+}
+.btn-show:hover {
+    background: #6F4E37;
+    color: white;
+}
+
+/* Edit button */
+.btn-edit {
+    background: #1D4A23;
+    color: white;
+    border: 1px solid #1D4A23;
+}
+.btn-edit:hover {
+    background: #99CC67;
+    color: black;
+}
+
+    
+</style>
+
+   <div class="container">
+    <table class="table">               
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>products</th>
+                  <th>Image</th>
+                 <th>Category</th>
+                <th>Description</th>
+                 <th>Size</th>
+                  <th>Quantity</th>
+                <th>Price</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                              <td>
+    {% if product.image %}
+        <img src="{{ asset('uploads/images/' ~ product.image) }}" alt="{{ product.name }}" style="max-width: 100px; height: auto;">
+    {% else %}
+        No image
+    {% endif %}
+</td>
+                <td>{{ product.category }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.size }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>₱{{ product.price }}</td>
+    
+
+                <td>
+    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-action btn-show">Show</a>
+    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-action btn-edit">Edit</a>
+</td>
+
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+      <a class="btn" href="{{ path('app_product_new') }}">+ Add New Menu Item</a>
+{% endblock %}

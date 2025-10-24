@@ -1,0 +1,44 @@
+ {% extends 'base.html.twig' %}
+
+{% block title %}New Stock{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-color: #99CC67;
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .new-stock-page {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 50px;
+    }
+
+    .form-container {
+        background-color: #fff;
+        padding: 40px 60px;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        width: 450px;
+        position: relative;
+    }
+
+    .new-stock-page h1 {
+        text-align: center;
+        color: #1f4e25;
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="new-stock-page">
+    <div class="form-container">
+        <h1>Create new Stock</h1>
+        {{ include('stock/_form.html.twig') }}
+    </div>
+</div>
+{% endblock %}

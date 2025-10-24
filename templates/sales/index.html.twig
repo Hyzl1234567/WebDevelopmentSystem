@@ -1,0 +1,145 @@
+ {% extends 'dashboard/layout.html.twig' %}
+
+{% block title %}Sales{% endblock %}
+
+{% block body %}
+<style>
+    .sales-container {
+        background-color: #FDFBF5; /* cream white */
+        font-family: 'Poppins', sans-serif;
+        color: #1D4A23;
+        padding: 30px 60px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin: 20px auto;
+        max-width: 1100px;
+    }
+
+    .sales-header {
+        text-align: center;
+        color: #1D4A23;
+        font-size: 34px;
+        font-weight: 700;
+        margin-bottom: 40px;
+    }
+
+    .summary {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-bottom: 50px;
+        flex-wrap: wrap;
+    }
+
+    .summary-card {
+        flex: 1;
+        min-width: 220px;
+        max-width: 320px;
+        background: white;
+        padding: 25px 40px;
+        border-radius: 16px;
+        border: 2px solid #99CC67;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    .summary-card h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #1D4A23;
+        margin-bottom: 10px;
+    }
+
+    .summary-card p {
+        font-size: 28px;
+        font-weight: bold;
+        color: #99CC67;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #eaeaea;
+        font-size: 15px;
+    }
+
+    th {
+        background-color: #1D4A23;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    tr:hover {
+        background-color: #f7ffef;
+    }
+
+    td:nth-child(4) {
+        font-weight: 600;
+        color: #1D4A23;
+    }
+
+    .no-records {
+        text-align: center;
+        color: #1D4A23;
+        padding: 20px;
+    }
+</style>
+
+<div class="sales-container">
+    <h1 class="sales-header">Sales Overview</h1>
+
+    <div class="summary">
+        <div class="summary-card">
+            <h3>Total Sales</h3>
+            <p>{{ totalSales }}</p>
+        </div>
+        <div class="summary-card">
+            <h3>Total Revenue</h3>
+            <p>₱{{ totalRevenue|number_format(2, '.', ',') }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Total Amount</th>
+                <th>Sale Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+                <tr>
+                    <td>{{ sale.id }}</td>
+                    <td>{{ sale.product.name }}</td>
+                    <td>{{ sale.quantity }}</td>
+                    <td>₱{{ sale.totalAmount|number_format(2, '.', ',') }}</td>
+                    <td>{{ sale.saleDate|date('Y-m-d H:i') }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="no-records">No sales records found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

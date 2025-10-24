@@ -1,0 +1,142 @@
+ {% extends 'dashboard/layout.html.twig' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-color: #fff;
+        font-family: Arial, sans-serif;
+    }
+
+    .order-container {
+        width: 90%;
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0,0,0,1);
+    }
+
+    .order-container h2 {
+        text-align: center;
+        color: #1D4A23;
+        margin-bottom: 10px;
+        font-size: 26px;
+        font-weight: bold;
+    }
+
+    .order-container p {
+        text-align: center;
+        color: #555;
+        margin-bottom: 25px;
+        font-size: 15px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    thead {
+        background-color: #1D4A23;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: center;
+        font-size: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tbody tr:hover {
+        background-color: #f4f9ef;
+        transition: 0.2s ease-in-out;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .bg-warning {
+        background-color: #FFD700;
+        color: #333;
+    }
+
+    .bg-success {
+        background-color: #99CC67;
+        color: #1D4A23;
+    }
+
+    .bg-danger {
+        background-color: #E74C3C;
+        color: white;
+    }
+
+    .bg-secondary {
+        background-color: #bdc3c7;
+        color: white;
+    }
+
+    .no-orders {
+        text-align: center;
+        color: #555;
+        padding: 20px;
+        font-size: 15px;
+    }
+</style>
+
+<div class="order-container">
+    <h2>📦 Orders</h2>
+    <p>Manage and view all customer orders here.</p>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if orders is defined and orders|length > 0 %}
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.customer }}</td>
+                            <td>{{ order.product.name ?? 'N/A' }}</td>
+                            <td>
+                                {% if order.status == 'Pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elseif order.status == 'Completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elseif order.status == 'Cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Unknown</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.createdAt ? order.createdAt|date('Y-m-d H:i') : '—' }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="no-orders">No orders found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

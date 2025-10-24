@@ -1,0 +1,105 @@
+ {% extends 'base.html.twig' %}
+
+{% block title %}Edit Product{% endblock %}
+
+{% block body %}
+    <style>
+
+    body{
+        background: #99CC67;
+    }
+
+    .readonly-field {
+    background-color: #f4f4f4;
+    color: #555;
+    border: 1px solid #ccc;
+    cursor: not-allowed;
+}
+
+        .form-container {
+            width: 600px;
+            margin: 40px auto;
+            padding: 25px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,2);
+            font-family: Arial, sans-serif;
+        }
+
+        .form-container h1 {
+            text-align: center;
+            color: #6b4226;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+ .form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Unified button look */
+button,
+.form-actions .btn,
+.form-actions form button {
+    background: #1D4A23;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Hover effect */
+button:hover,
+.form-actions .btn:hover,
+.form-actions form button:hover {
+    background: #99CC67;
+    color: black;
+}
+
+
+    </style>
+
+    <div class="form-container">
+    <h1>✏ Edit Product</h1>
+
+    {# Update form (Update button stays inside here) #}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button type="submit">Update</button>
+    {{ form_end(form) }}
+
+    {# Action buttons: Back + Delete #}
+    <div class="form-actions">
+        <a href="{{ path('app_product_index') }}" class="btn">Back</a>
+        {{ include('product/_delete_form.html.twig') }}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,169 @@
+ {% extends 'dashboard/layout.html.twig' %}
+
+{% block title %}Category index{% endblock %}
+
+{% block body %}
+<style>
+/* === Category Page Styling === */
+
+/* Page title */
+h1 {
+    color: #2d4d22;
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* Table container */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #f9fff6;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,1);
+}
+
+/* Table headers */
+.table thead {
+    background-color: #2d4d22;
+    color: white;
+}
+
+.table th {
+    text-align: left;
+    padding: 14px;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+}
+
+/* Table rows */
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+    font-size: 15px;
+}
+
+.table tr:hover {
+    background-color: #eef7e6;
+    transition: 0.2s;
+}
+
+/* Buttons */
+.table a {
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-right: 5px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.table a[href*="show"] {
+    background-color: #1D4A23;
+    color: white;
+}
+
+.table a[href*="show"]:hover {
+    background-color: #2f6b35;
+}
+
+/* Edit Button */
+.table a[href*="edit"] {
+    background-color: #1D4A23;
+    color: white;
+}
+
+.table a[href*="edit"]:hover {
+    background-color: #2f6b35;
+}
+
+/* Create New Button */
+a[href*="new"] {
+    display: inline-block;
+    background-color: #99CC67;
+    color: #1D4A23;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 20px;
+    transition: background-color 0.2s ease;
+}
+
+a[href*="new"]:hover {
+    background-color: #b6df8a;
+}
+
+/* Empty table message */
+.table td[colspan="4"] {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.btn-show {
+    background-color: #1D4A23;
+    color: white;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-right: 5px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+
+
+.btn-edit {
+    
+    color: white;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-right: 5px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+
+
+</style>
+
+<h1>☘️ Category List ☘️</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for category in categories %}
+        <tr>
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
+            <td>{{ category.description }}</td>
+            <td>
+                <a href="{{ path('app_category_show', {'id': category.id}) }}">Show</a>
+                <a href="{{ path('app_category_edit', {'id': category.id}) }}">Edit</a>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="4">No records found 🌿</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ path('app_category_new') }}">➕ Create new</a>
+{% endblock %}
