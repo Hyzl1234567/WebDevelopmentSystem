@@ -3,126 +3,127 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<style>
- <style>
-/* --- Dashboard Summary Cards --- */
-.dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
-}
+    {% if message %}
+        <div style="background-color:#e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align:center;">
+            <h2>{{ message }}</h2>
+        </div>
+    {% endif %}
 
-.card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  height: 140px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+    <style>
+    /* --- Dashboard Summary Cards --- */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-}
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-.card i {
-  font-size: 28px;
-  margin-bottom: 10px;
-}
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
 
-.card.green { border-left: 6px solid #2d572c; }
-.card.orange { border-left: 6px solid #ff9f1c; }
-.card.red { border-left: 6px solid #d62828; }
+    .card i {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
 
-/* --- Category Cards --- */
-.category-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  text-align: center;
-  padding: 15px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  height: 140px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-left: 6px solid #2d572c;
-}
+    .card.green { border-left: 6px solid #2d572c; }
+    .card.orange { border-left: 6px solid #ff9f1c; }
+    .card.red { border-left: 6px solid #d62828; }
 
-.category-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-}
+    /* --- Category Cards --- */
+    .category-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      padding: 15px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-left: 6px solid #2d572c;
+    }
 
-.category-img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin: 0 auto 10px auto;
-}
+    .category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
 
-.category-title {
-  font-weight: 600;
-  font-size: 1rem;
-  margin: 0;
-}
+    .category-img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin: 0 auto 10px auto;
+    }
 
-.category-text {
-  font-size: 0.85rem;
-  color: #6c757d;
-  margin-top: 4px;
-}
+    .category-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin: 0;
+    }
 
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
-</style>
+    .category-text {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 4px;
+    }
 
- 
-   <!-- Product Categories -->
-<h2 class="mb-4 text-center fw-bold">Product Categories</h2>
-<div class="category-grid">
-  {% for category in categories %}
-    <div class="category-card">
-      <img src="{{ asset('image/' ~ category.image) }}" alt="{{ category.name }}" class="category-img">
-      <h5 class="category-title">{{ category.name }}</h5>
-      <p class="category-text">{{ category.description }}</p>
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    </style>
+
+    <!-- Product Categories -->
+    <h2 class="mb-4 text-center fw-bold">Product Categories</h2>
+    <div class="category-grid">
+      {% for category in categories %}
+        <div class="category-card">
+          <img src="{{ asset('image/' ~ category.image) }}" alt="{{ category.name }}" class="category-img">
+          <h5 class="category-title">{{ category.name }}</h5>
+          <p class="category-text">{{ category.description }}</p>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
 
-<div class="container mt-5">
-  <h1 class="mb-4 text-center fw-bold">Dashboard Overview</h1>
+    <div class="container mt-5">
+      <h1 class="mb-4 text-center fw-bold">Dashboard Overview</h1>
 
-  <!-- Dashboard Stats -->
-  <div class="dashboard-cards mb-5">
-    <div class="card green">
-      <i class="fas fa-mug-hot"></i>
-      <h3>Total Products</h3>
-      <p>8</p>
+      <!-- Dashboard Stats -->
+      <div class="dashboard-cards mb-5">
+        <div class="card green">
+          <i class="fas fa-mug-hot"></i>
+          <h3>Total Products</h3>
+          <p>8</p>
+        </div>
+        <div class="card orange">
+          <i class="fas fa-boxes"></i>
+          <h3>Total Stocks</h3>
+          <p>50</p>
+        </div>
+        <div class="card red">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Low Stock</h3>
+          <p>0</p>
+        </div>
+      </div>
     </div>
-    <div class="card orange">
-      <i class="fas fa-boxes"></i>
-      <h3>Total Stocks</h3>
-      <p>50</p>
-    </div>
-    <div class="card red">
-      <i class="fas fa-exclamation-triangle"></i>
-      <h3>Low Stock</h3>
-      <p>0</p>
-    </div>
-  </div>
-
- 
- 
-</script>
 {% endblock %}
