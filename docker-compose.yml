@@ -19,8 +19,8 @@
     restart: unless-stopped
     environment:
       PMA_HOST: mysql
-      PMA_USER: ${TEST_DEMO_USER}
-      PMA_PASSWORD: ${TEST_DEMO_PASSWORD}
+      PMA_USER: test_demo_user
+      PMA_PASSWORD: test_demo_password
     ports:
       - "8080:80"
     depends_on:

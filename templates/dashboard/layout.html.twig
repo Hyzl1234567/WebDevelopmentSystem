@@ -6,7 +6,8 @@
     <title>{% block title %}Dashboard{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+        
 </head>
 <style> 
 body {
@@ -500,5 +501,14 @@ body {
     </main>
 </div>
 
+        
+        {# jQuery (MUST come first) #}
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        
+        {# DataTables JS (MUST come after jQuery) #}
+        <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+        
+        {% block javascripts %}
+        {% endblock %}
 </body>
 </html>

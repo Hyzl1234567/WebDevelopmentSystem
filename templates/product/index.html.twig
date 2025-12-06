@@ -1,117 +1,109 @@
-{% extends 'dashboard/layout.html.twig' %}
+ {% extends 'dashboard/layout.html.twig' %}
 
 {% block title %}Product index{% endblock %}
 
-{% block body %}
-
-
+{% block stylesheets %}
 <style>
- 
- body {
+    body {
         background-color: #fff; 
         font-family: Arial, sans-serif;
     }
 
     .container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 30px auto;
         padding: 20px;
         background: #fff;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,1);
-    }
-
-    
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    th {
+    /* Override DataTables default header styling */
+    table.dataTable thead th {
+        background: #1D4A23 !important;
+        color: white !important;
+        padding: 12px !important;
+        border-bottom: none !important;
+    }
+
+    table.dataTable tbody td {
+        padding: 10px;
+    }
+
+    table.dataTable tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    /* Action buttons */
+    .btn-action {
+        display: inline-block;
+        padding: 6px 14px;
+        margin: 2px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-show {
+        background: #99CC67;
+        color: black;
+    }
+    
+    .btn-show:hover {
+        background: #6F4E37;
+        color: white;
+    }
+
+    .btn-edit {
         background: #1D4A23;
         color: white;
-        padding: 10px;
-        text-align: left;
+    }
+    
+    .btn-edit:hover {
+        background: #99CC67;
+        color: black;
     }
 
-    td {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-    }
-
-    tr:hover td {
-        background: #f9f9f9;
-    }
-
-    a.btn {
+    .btn-add {
         display: inline-block;
-        padding: 8px 12px;
-        margin-top: 15px;
+        padding: 10px 20px;
+        margin-bottom: 20px;
         background: #99CC67;
         color: black;
         border-radius: 5px;
         text-decoration: none;
-        
+        font-weight: bold;
     }
 
-    a.btn:hover {
+    .btn-add:hover {
         background: #1D4A23;
-        color:white;
+        color: white;
     }
-
-/* Action buttons */
-.btn-action {
-    display: inline-block;
-    padding: 6px 14px;
-    margin: 2px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-/* Show button */
-.btn-show {
-    background: #99CC67;
-    color: black;
-    border: 1px solid #99CC67;
-}
-.btn-show:hover {
-    background: #6F4E37;
-    color: white;
-}
-
-/* Edit button */
-.btn-edit {
-    background: #1D4A23;
-    color: white;
-    border: 1px solid #1D4A23;
-}
-.btn-edit:hover {
-    background: #99CC67;
-    color: black;
-}
-
-    
 </style>
+{% endblock %}
 
-   <div class="container">
-    <table class="table">               
+{% block body %}
+<div class="container">
+    <h1>Product List</h1>
+    
+    <a class="btn-add" href="{{ path('app_product_new') }}">+ Add New Menu Item</a>
+    
+    <table id="productTable" class="display" style="width:100%">               
         <thead>
             <tr>
                 <th>Id</th>
-                <th>products</th>
-                  <th>Image</th>
-                 <th>Category</th>
+                <th>Products</th>
+                <th>Image</th>
+                <th>Category</th>
                 <th>Description</th>
-                 <th>Size</th>
-                  <th>Quantity</th>
+                <th>Size</th>
+                <th>Quantity</th>
                 <th>Price</th>
-                <th>actions</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -119,33 +111,61 @@
             <tr>
                 <td>{{ product.id }}</td>
                 <td>{{ product.name }}</td>
-                              <td>
-    {% if product.image %}
-        <img src="{{ asset('uploads/images/' ~ product.image) }}" alt="{{ product.name }}" style="max-width: 100px; height: auto;">
-    {% else %}
-        No image
-    {% endif %}
-</td>
+                <td>
+                    {% if product.image %}
+                        <img src="{{ asset('uploads/images/' ~ product.image) }}" alt="{{ product.name }}" style="max-width: 80px; height: auto;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                </td>
                 <td>{{ product.category }}</td>
                 <td>{{ product.description }}</td>
                 <td>{{ product.size }}</td>
                 <td>{{ product.quantity }}</td>
                 <td>₱{{ product.price }}</td>
-    
-
                 <td>
-    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-action btn-show">Show</a>
-    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-action btn-edit">Edit</a>
-</td>
-
+                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-action btn-show">Show</a>
+                    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-action btn-edit">Edit</a>
+                </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="9">No records found</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+</div>
+{% endblock %}
 
-      <a class="btn" href="{{ path('app_product_new') }}">+ Add New Menu Item</a>
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#productTable').DataTable({
+                "pageLength": 10,           // Show 10 rows per page
+                "order": [[0, "asc"]],      // Sort by ID column ascending
+                "columnDefs": [
+                    { 
+                        "orderable": false, 
+                        "targets": [2, 8]   // Disable sorting on Image and Actions columns
+                    }
+                ],
+                "language": {
+                    "search": "Search products:",
+                    "lengthMenu": "Show _MENU_ products per page",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ products",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    }
+                }
+            });
+            
+            console.log('DataTable initialized successfully!');
+        });
+    </script>
 {% endblock %}

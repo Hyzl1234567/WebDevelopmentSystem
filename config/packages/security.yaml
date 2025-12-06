@@ -40,7 +40,7 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
-        - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/dashboard, roles: ROLE_ADMIN }
         - { path: ^/staff, roles: ROLE_STAFF }
 
     role_hierarchy: {  }

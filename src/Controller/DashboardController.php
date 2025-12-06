@@ -10,8 +10,6 @@ class DashboardController extends AbstractController
     #[Route('/dashboard', name: 'app_dashboard')]
     public function index(): Response
     {
-        $message = "Welcome to the dashboard! (Protected Area)";
-
         $categories = [
             ['name' => 'Coffee', 'image' => 'coffee.png', 'description' => 'Rich espresso and brewed coffee.'],
             ['name' => 'Tea', 'image' => 'tea.png', 'description' => 'Soothing hot or iced teas.'],
@@ -24,8 +22,8 @@ class DashboardController extends AbstractController
         ];
 
         return $this->render('dashboard/index.html.twig', [
-            'message' => $message,
             'categories' => $categories,
         ]);
     }
 }
+
