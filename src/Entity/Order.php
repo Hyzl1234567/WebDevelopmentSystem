@@ -94,4 +94,10 @@ class Order
 
         return $this;
     }
+
+    public function __construct()
+{
+    $this->createdAt = new \DateTimeImmutable();
+    $this->status = 'Pending'; // Set default status
+}
 }

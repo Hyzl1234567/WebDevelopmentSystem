@@ -1,0 +1,131 @@
+ {% extends 'dashboard/layout.html.twig' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block body %}
+<style>
+    .profile-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #99CC67;
+    }
+
+    .profile-info {
+        margin: 20px 0;
+    }
+
+    .info-row {
+        display: flex;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #2d4d22;
+        width: 150px;
+    }
+
+    .info-value {
+        color: #555;
+    }
+
+    .btn-group {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #2d4d22;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #3b5b2a;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .alert {
+        padding: 12px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+</style>
+
+<div class="profile-container">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <div class="profile-header">
+        <h1>My Profile</h1>
+    </div>
+
+    <div class="profile-info">
+        <div class="info-row">
+            <div class="info-label">Username:</div>
+            <div class="info-value">{{ user.username }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Roles:</div>
+            <div class="info-value">
+                {% for role in user.roles %}
+                    <span style="background: #99CC67; padding: 3px 8px; border-radius: 3px; margin-right: 5px;">{{ role }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Account Status:</div>
+            <div class="info-value">
+                {% if user.isVerified %}
+                    <span style="color: green;">✓ Verified</span>
+                {% else %}
+                    <span style="color: orange;">⚠ Not Verified</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <a href="{{ path('app_change_password') }}" class="btn btn-primary">Change Password</a>
+        <a href="{{ path('app_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

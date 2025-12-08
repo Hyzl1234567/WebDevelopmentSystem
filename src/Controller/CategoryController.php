@@ -5,13 +5,16 @@ namespace App\Controller;
 use App\Entity\Category;
 use App\Form\CategoryType;
 use App\Repository\CategoryRepository;
+use App\Service\ActivityLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/category')]
+#[IsGranted('ROLE_STAFF')] // Ensure only staff/admin can access
 final class CategoryController extends AbstractController
 {
     #[Route(name: 'app_category_index', methods: ['GET'])]
@@ -23,7 +26,7 @@ final class CategoryController extends AbstractController
     }
 
     #[Route('/new', name: 'app_category_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, ActivityLogger $activityLogger): Response
     {
         $category = new Category();
         $form = $this->createForm(CategoryType::class, $category);
@@ -33,6 +36,19 @@ final class CategoryController extends AbstractController
             $entityManager->persist($category);
             $entityManager->flush();
 
+            // LOG: Staff/Admin creates a category
+            $activityLogger->log(
+                $this->getUser(),
+                'create',
+                'Category',
+                $category->getId(),
+                sprintf('%s created category: %s', 
+                    in_array('ROLE_ADMIN', $this->getUser()->getRoles()) ? 'Admin' : 'Staff',
+                    $category->getName()
+                )
+            );
+
+            $this->addFlash('success', 'Category created successfully!');
             return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -51,7 +67,7 @@ final class CategoryController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_category_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Category $category, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Category $category, EntityManagerInterface $entityManager, ActivityLogger $activityLogger): Response
     {
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
@@ -59,6 +75,19 @@ final class CategoryController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            // LOG: Staff/Admin edits a category
+            $activityLogger->log(
+                $this->getUser(),
+                'update',
+                'Category',
+                $category->getId(),
+                sprintf('%s updated category: %s', 
+                    in_array('ROLE_ADMIN', $this->getUser()->getRoles()) ? 'Admin' : 'Staff',
+                    $category->getName()
+                )
+            );
+
+            $this->addFlash('success', 'Category updated successfully!');
             return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -69,11 +98,28 @@ final class CategoryController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_category_delete', methods: ['POST'])]
-    public function delete(Request $request, Category $category, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Category $category, EntityManagerInterface $entityManager, ActivityLogger $activityLogger): Response
     {
         if ($this->isCsrfTokenValid('delete'.$category->getId(), $request->getPayload()->getString('_token'))) {
+            $categoryName = $category->getName();
+            $categoryId = $category->getId();
+
+            // LOG BEFORE DELETION: Staff/Admin deletes a category
+            $activityLogger->log(
+                $this->getUser(),
+                'delete',
+                'Category',
+                $categoryId,
+                sprintf('%s deleted category: %s', 
+                    in_array('ROLE_ADMIN', $this->getUser()->getRoles()) ? 'Admin' : 'Staff',
+                    $categoryName
+                )
+            );
+
             $entityManager->remove($category);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Category deleted successfully!');
         }
 
         return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);

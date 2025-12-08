@@ -1,15 +1,70 @@
 <?php
 namespace App\Controller;
 
- use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\ActivityLogRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_dashboard')]
-    public function index(): Response
-    {
+    public function index(
+        UserRepository $userRepository,
+        ActivityLogRepository $activityLogRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        // Get all users first
+        $users = $userRepository->findAll();
+        $totalUsers = count($users);
+        
+        // Count users by role - FIXED
+        $totalAdmins = count(array_filter($users, function($user) {
+            return in_array('ROLE_ADMIN', $user->getRoles());
+        }));
+        
+        $totalStaff = count(array_filter($users, function($user) {
+            return in_array('ROLE_STAFF', $user->getRoles());
+        }));
+        
+        // Count products (adjust table name if needed)
+        $totalProducts = 0;
+        try {
+            $connection = $entityManager->getConnection();
+            $result = $connection->executeQuery('SELECT COUNT(*) as count FROM product');
+            $totalProducts = $result->fetchOne();
+        } catch (\Exception $e) {
+            $totalProducts = 0;
+        }
+
+        // Count categories
+        $totalCategories = 0;
+        try {
+            $connection = $entityManager->getConnection();
+            $result = $connection->executeQuery('SELECT COUNT(*) as count FROM category');
+            $totalCategories = $result->fetchOne();
+        } catch (\Exception $e) {
+            $totalCategories = 0;
+        }
+
+        // Count stocks
+        $totalStocks = 0;
+        try {
+            $connection = $entityManager->getConnection();
+            $result = $connection->executeQuery('SELECT COUNT(*) as count FROM stock');
+            $totalStocks = $result->fetchOne();
+        } catch (\Exception $e) {
+            $totalStocks = 0;
+        }
+
+        // Calculate total records - NEW
+        $totalRecords = $totalProducts + $totalCategories + $totalStocks;
+
+        // Get recent activities
+        $recentActivities = $activityLogRepository->findRecentActivities(10);
+
         $categories = [
             ['name' => 'Coffee', 'image' => 'coffee.png', 'description' => 'Rich espresso and brewed coffee.'],
             ['name' => 'Tea', 'image' => 'tea.png', 'description' => 'Soothing hot or iced teas.'],
@@ -23,7 +78,14 @@ class DashboardController extends AbstractController
 
         return $this->render('dashboard/index.html.twig', [
             'categories' => $categories,
+            'totalUsers' => $totalUsers,
+            'totalAdmins' => $totalAdmins,
+            'totalStaff' => $totalStaff,
+            'totalProducts' => $totalProducts,
+            'totalCategories' => $totalCategories,
+            'totalStocks' => $totalStocks,
+            'totalRecords' => $totalRecords, // NEW
+            'recentActivities' => $recentActivities,
         ]);
     }
 }
-

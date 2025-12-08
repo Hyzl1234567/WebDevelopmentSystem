@@ -1,5 +1,7 @@
 parameters:
     images_directory: '%kernel.project_dir%/public/uploads/images'
+    app.timezone: 'Asia/Manila'
+
 
 services:
     _defaults:

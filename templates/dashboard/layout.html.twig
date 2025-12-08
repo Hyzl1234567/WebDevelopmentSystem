@@ -403,7 +403,14 @@ body {
      <!-- Sidebar -->
 <aside class="sidebar">
     <ul class="nav-list">
-    
+
+     <li>
+            <a href="{{ path('app_profile') }}">
+                <i class="fas fa-user"></i>
+                <span class="nav-text">My Profile</span>
+            </a>
+        </li>
+
         <li>
             <a href="{{ path('app_dashboard') }}">
                 <i class="fas fa-home"></i>
@@ -423,7 +430,7 @@ body {
             </a>
         </li>
         <li>
-           <a href="{{ path('app_order') }}">
+           <a href="{{ path('app_order_index') }}">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="nav-text">Orders</span>
             </a>

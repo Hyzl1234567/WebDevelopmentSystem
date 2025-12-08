@@ -1,0 +1,232 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block body %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #2d4d22;
+        margin-bottom: 30px;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #2d4d22;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #3b5b2a;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+        margin: 2px;
+    }
+
+    table {
+        width: 100%;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    thead {
+        background-color: #2d4d22;
+        color: white;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+    }
+
+    tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-disabled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-archived {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+
+    .role-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        margin: 2px;
+        display: inline-block;
+    }
+
+    .role-admin {
+        background-color: #ff6b6b;
+        color: white;
+    }
+
+    .role-staff {
+        background-color: #4ecdc4;
+        color: white;
+    }
+
+    .role-user {
+        background-color: #95e1d3;
+        color: #000;
+    }
+
+    .alert {
+        padding: 12px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .actions {
+        white-space: nowrap;
+    }
+
+    .delete-form {
+        display: inline;
+    }
+</style>
+
+<div class="container">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <div class="header-actions">
+        <h1>User Management</h1>
+        <div>
+            <a href="{{ path('app_user_management_new') }}" class="btn btn-primary">+ Create New User</a>
+            <a href="{{ path('app_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Roles</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email ?? 'N/A' }}</td>
+                <td>{{ user.fullName ?? 'N/A' }}</td>
+                <td>
+                    {% for role in user.roles %}
+                        {% if role == 'ROLE_ADMIN' %}
+                            <span class="role-badge role-admin">ADMIN</span>
+                        {% elseif role == 'ROLE_STAFF' %}
+                            <span class="role-badge role-staff">STAFF</span>
+                        {% elseif role == 'ROLE_USER' %}
+                            <span class="role-badge role-user">USER</span>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <span class="status-badge status-{{ user.status }}">
+                        {{ user.status|upper }}
+                    </span>
+                </td>
+                <td>{{ user.createdAt ? user.createdAt|date('Y-m-d H:i') : 'N/A' }}</td>
+                <td class="actions">
+                    <a href="{{ path('app_user_management_edit', {id: user.id}) }}" class="btn btn-info btn-sm">Edit</a>
+                    <a href="{{ path('app_user_management_reset_password', {id: user.id}) }}" class="btn btn-warning btn-sm">Reset Password</a>
+                    
+                    {% if user.status == 'active' %}
+                        <a href="{{ path('app_user_management_toggle_status', {id: user.id}) }}" class="btn btn-warning btn-sm">Disable</a>
+                    {% else %}
+                        <a href="{{ path('app_user_management_toggle_status', {id: user.id}) }}" class="btn btn-primary btn-sm">Enable</a>
+                    {% endif %}
+                    
+                    <a href="{{ path('app_user_management_archive', {id: user.id}) }}" class="btn btn-secondary btn-sm">Archive</a>
+                    
+                    <form method="post" action="{{ path('app_user_management_delete', {id: user.id}) }}" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone!');">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center;">No users found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -8,7 +8,7 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: email
+                property: username
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -40,8 +40,11 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/admin/users, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: 'ROLE_ADMIN, ROLE_STAFF' }
         - { path: ^/dashboard, roles: ROLE_ADMIN }
         - { path: ^/staff, roles: ROLE_STAFF }
+        - { path: ^/product, roles: 'ROLE_ADMIN, ROLE_STAFF' } 
 
     role_hierarchy: {  }
 

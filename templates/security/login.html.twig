@@ -39,7 +39,7 @@
         margin-bottom: 5px;
     }
 
-    input[type="email"],
+    input[type="text"],
     input[type="password"] {
         width: 100%;
         padding: 10px 12px;
@@ -48,9 +48,10 @@
         font-size: 14px;
         outline: none;
         transition: border-color 0.2s ease;
+        box-sizing: border-box;
     }
 
-    input[type="email"]:focus,
+    input[type="text"]:focus,
     input[type="password"]:focus {
         border-color: #2d4d22;
     }
@@ -102,14 +103,10 @@
         <div class="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
 
-    {% if app.user %}
-        
-    {% endif %}
-
     <h1>Please Sign In</h1>
 
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" autocomplete="email" required autofocus>
+    <label for="inputUsername">Username</label>
+    <input type="text" value="{{ last_username }}" name="username" id="inputUsername" autocomplete="username" required autofocus>
 
     <label for="inputPassword">Password</label>
     <input type="password" name="password" id="inputPassword" autocomplete="current-password" required>
