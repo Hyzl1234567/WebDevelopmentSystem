@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ActivityLog;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -31,134 +32,148 @@ class ActivityLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find activities by action type
+     * Find activity logs with optional filters
      */
-    public function findByAction(string $action, int $limit = 50): array
+    public function findWithFilters(?User $user = null, ?string $action = null, ?\DateTimeImmutable $startDate = null, ?\DateTimeImmutable $endDate = null): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')
+            ->addSelect('u');
+
+        if ($user) {
+            $qb->andWhere('a.user = :user')
+               ->setParameter('user', $user);
+        }
+
+        if ($action) {
+            $qb->andWhere('a.action = :action')
+               ->setParameter('action', $action);
+        }
+
+        if ($startDate) {
+            $qb->andWhere('a.createdAt >= :startDate')
+               ->setParameter('startDate', $startDate);
+        }
+
+        if ($endDate) {
+            // Set end date to end of day (23:59:59)
+            $endOfDay = $endDate->setTime(23, 59, 59);
+            $qb->andWhere('a.createdAt <= :endDate')
+               ->setParameter('endDate', $endOfDay);
+        }
+
+        return $qb->orderBy('a.createdAt', 'DESC')
+                  ->getQuery()
+                  ->getResult();
+    }
+
+    /**
+     * Find all activity logs ordered by most recent
+     */
+    public function findAllOrdered(): array
     {
         return $this->createQueryBuilder('a')
             ->leftJoin('a.user', 'u')
             ->addSelect('u')
-            ->andWhere('a.action = :action')
+            ->orderBy('a.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find activity logs by action type
+     */
+    public function findByAction(string $action): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')
+            ->addSelect('u')
+            ->where('a.action = :action')
             ->setParameter('action', $action)
             ->orderBy('a.createdAt', 'DESC')
-            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Find activities by user
+     * Find activity logs by entity type
      */
-    public function findByUser(int $userId, int $limit = 50): array
+    public function findByEntity(string $entity): array
     {
         return $this->createQueryBuilder('a')
             ->leftJoin('a.user', 'u')
             ->addSelect('u')
-            ->andWhere('a.user = :userId')
-            ->setParameter('userId', $userId)
-            ->orderBy('a.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Find activities by entity type
-     */
-    public function findByEntity(string $entity, int $limit = 50): array
-    {
-        return $this->createQueryBuilder('a')
-            ->leftJoin('a.user', 'u')
-            ->addSelect('u')
-            ->andWhere('a.entity = :entity')
+            ->where('a.entity = :entity')
             ->setParameter('entity', $entity)
             ->orderBy('a.createdAt', 'DESC')
-            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Find activities within date range
+     * Find activity logs by user
      */
-    public function findByDateRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('a')
             ->leftJoin('a.user', 'u')
             ->addSelect('u')
-            ->andWhere('a.createdAt BETWEEN :startDate AND :endDate')
-            ->setParameter('startDate', $startDate)
-            ->setParameter('endDate', $endDate)
+            ->where('a.user = :user')
+            ->setParameter('user', $user)
             ->orderBy('a.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Count activities by action type
+     * Get unique actions from logs
+     */
+    public function getUniqueActions(): array
+    {
+        return $this->createQueryBuilder('a')
+            ->select('DISTINCT a.action')
+            ->where('a.action IS NOT NULL')
+            ->orderBy('a.action', 'ASC')
+            ->getQuery()
+            ->getScalarResult();
+    }
+
+    /**
+     * Get unique entities from logs
+     */
+    public function getUniqueEntities(): array
+    {
+        return $this->createQueryBuilder('a')
+            ->select('DISTINCT a.entity')
+            ->where('a.entity IS NOT NULL')
+            ->orderBy('a.entity', 'ASC')
+            ->getQuery()
+            ->getScalarResult();
+    }
+
+    /**
+     * Count logs by action type
      */
     public function countByAction(string $action): int
     {
         return $this->createQueryBuilder('a')
             ->select('COUNT(a.id)')
-            ->andWhere('a.action = :action')
+            ->where('a.action = :action')
             ->setParameter('action', $action)
             ->getQuery()
             ->getSingleScalarResult();
     }
 
     /**
-     * Get activity statistics
+     * Count logs by user
      */
-    public function getStatistics(): array
-    {
-        $result = $this->createQueryBuilder('a')
-            ->select('a.action, COUNT(a.id) as count')
-            ->groupBy('a.action')
-            ->getQuery()
-            ->getResult();
-
-        $stats = [];
-        foreach ($result as $row) {
-            $stats[$row['action']] = $row['count'];
-        }
-
-        return $stats;
-    }
-
-    /**
-     * Find all login/logout activities
-     */
-    public function findLoginLogoutActivities(int $limit = 50): array
+    public function countByUser(User $user): int
     {
         return $this->createQueryBuilder('a')
-            ->leftJoin('a.user', 'u')
-            ->addSelect('u')
-            ->andWhere('a.action IN (:actions)')
-            ->setParameter('actions', ['login', 'logout'])
-            ->orderBy('a.createdAt', 'DESC')
-            ->setMaxResults($limit)
+            ->select('COUNT(a.id)')
+            ->where('a.user = :user')
+            ->setParameter('user', $user)
             ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Get today's activities
-     */
-    public function findTodayActivities(): array
-    {
-        $today = new \DateTime('today');
-        $tomorrow = new \DateTime('tomorrow');
-
-        return $this->createQueryBuilder('a')
-            ->leftJoin('a.user', 'u')
-            ->addSelect('u')
-            ->andWhere('a.createdAt >= :today')
-            ->andWhere('a.createdAt < :tomorrow')
-            ->setParameter('today', $today)
-            ->setParameter('tomorrow', $tomorrow)
-            ->orderBy('a.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->getSingleScalarResult();
     }
 }

@@ -1,0 +1,157 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block title %}Add New Customer{% endblock %}
+
+{% block body %}
+<style>
+    .form-container {
+        width: 90%;
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .form-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #1D4A23;
+    }
+
+    .form-header h1 {
+        color: #1D4A23;
+        margin: 0 0 10px 0;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .form-header p {
+        color: #666;
+        margin: 0;
+        font-size: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #1D4A23;
+        box-shadow: 0 0 0 3px rgba(29, 74, 35, 0.1);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background-color: #1D4A23;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2d6b34;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(29, 74, 35, 0.3);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    .help-text {
+        font-size: 13px;
+        color: #666;
+        margin-top: 5px;
+        font-style: italic;
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-header">
+        <h1>👥 Add New Customer</h1>
+        <p>Fill in the customer details below.</p>
+    </div>
+
+    {{ form_start(form) }}
+
+    <div class="form-group">
+        {{ form_label(form.name) }}
+        {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.name) }}
+        <div class="help-text">Required field</div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.email) }}
+        <div class="help-text">Optional</div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.phone) }}
+        {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.phone) }}
+        <div class="help-text">Optional</div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.address) }}
+        {{ form_widget(form.address, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.address) }}
+        <div class="help-text">Optional</div>
+    </div>
+
+    <div class="form-actions">
+        <a href="{{ path('app_customer_index') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">💾 Save Customer</button>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

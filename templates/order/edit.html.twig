@@ -71,11 +71,14 @@
         margin-top: 30px;
         padding-top: 20px;
         border-top: 1px solid #eee;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .form-actions-left {
         display: flex;
         gap: 15px;
+        flex-wrap: wrap;
     }
 
     .btn {
@@ -119,6 +122,11 @@
     .btn-danger:hover {
         background-color: #c0392b;
         transform: translateY(-2px);
+    }
+
+    .delete-form {
+        display: inline;
+        margin: 0;
     }
 
     .form-error {
@@ -175,9 +183,9 @@
         </div>
 
         <div class="form-group">
-            {{ form_label(form.totalPrice) }}
-            {{ form_widget(form.totalPrice, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.totalPrice) }}
+            {{ form_label(form.quantity) }}
+            {{ form_widget(form.quantity, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.quantity) }}
         </div>
 
         <div class="form-group">
@@ -195,5 +203,53 @@
             </div>
         </div>
     {{ form_end(form) }}
+
+    {# Delete form MUST be outside the update form #}
+    {% set canDelete = is_granted('ROLE_ADMIN') or (order.createdBy and order.createdBy.id == app.user.id) %}
+    
+    {% if canDelete %}
+        <div class="form-actions" style="margin-top: 20px; border-top: 2px dashed #e0e0e0; padding-top: 20px;">
+            <div class="form-actions-left"></div>
+            <form method="post" action="{{ path('app_order_delete', {'id': order.id}) }}" class="delete-form" id="deleteOrderForm">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ order.id) }}">
+                <button type="button" class="btn btn-danger" id="deleteOrderButton">🗑️ Delete Order</button>
+            </form>
+        </div>
+    {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButton = document.getElementById('deleteOrderButton');
+    const deleteForm = document.getElementById('deleteOrderForm');
+    
+    if (deleteButton && deleteForm) {
+        deleteButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const orderId = "{{ order.id }}";
+            const customerName = "{{ order.customer|escape('js') }}";
+            const productName = "{{ order.product ? order.product.name|escape('js') : 'N/A' }}";
+            const totalPrice = "{{ order.totalPrice|number_format(2) }}";
+            
+            const confirmMessage = `⚠️ WARNING: DELETE CONFIRMATION
+
+Are you ABSOLUTELY SURE you want to delete this order?
+
+Order ID: #${orderId}
+Customer: ${customerName}
+Product: ${productName}
+Total: ₱${totalPrice}
+
+⚠️ THIS ACTION CANNOT BE UNDONE!
+
+Click OK to DELETE, or Cancel to keep the order.`;
+            
+            if (confirm(confirmMessage)) {
+                deleteForm.submit();
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

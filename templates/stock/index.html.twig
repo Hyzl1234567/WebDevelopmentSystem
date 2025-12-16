@@ -5,7 +5,7 @@
 {% block body %}
 <style>
     .content-wrapper {
-        background-color: #fdfdf9; /* soft cream-white background */
+        background-color: #fdfdf9;
         border-radius: 12px;
         padding: 30px;
         width: 90%;
@@ -21,8 +21,75 @@
         margin-bottom: 25px;
     }
 
+    /* Flash messages */
+    .alert {
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* DataTable wrapper styling */
+    .dataTables_wrapper {
+        padding: 20px 0;
+    }
+
+    /* DataTable search box */
+    .dataTables_filter input {
+        border: 2px solid #234d20;
+        border-radius: 6px;
+        padding: 6px 12px;
+        margin-left: 8px;
+    }
+
+    /* DataTable length selector */
+    .dataTables_length select {
+        border: 2px solid #234d20;
+        border-radius: 6px;
+        padding: 4px 8px;
+        margin: 0 8px;
+    }
+
+    /* DataTable pagination */
+    .dataTables_paginate .paginate_button {
+        padding: 6px 12px;
+        margin: 0 2px;
+        border-radius: 6px;
+        border: 1px solid #234d20;
+        background: white;
+        color: #234d20 !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
+        background: #234d20 !important;
+        color: white !important;
+        border: 1px solid #234d20;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: #234d20 !important;
+        color: white !important;
+        border: 1px solid #234d20;
+    }
+
+    .dataTables_paginate .paginate_button.disabled {
+        color: #ccc !important;
+    }
+
     .table {
-        width: 100%;
+        width: 100% !important;
         border-collapse: collapse;
         background: #fff;
         border-radius: 10px;
@@ -51,24 +118,85 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    .table:hover {
+    .table tbody tr:hover {
         background-color: #f4f4f4;
         transition: background 0.3s ease;
     }
 
-    a {
+    /* Badge for Created By */
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .badge-admin {
+        background-color: #9b59b6;
+    }
+
+    .badge-staff {
+        background-color: #3498db;
+    }
+
+    .badge-unknown {
+        background-color: #95a5a6;
+    }
+
+    /* Action buttons */
+    .btn-action {
         text-decoration: none;
         color: #2d572c;
         font-weight: 600;
         margin-right: 10px;
         transition: color 0.3s ease;
+        padding: 6px 12px;
+        border-radius: 6px;
+        display: inline-block;
+        font-size: 14px;
     }
 
-    a:hover {
-        color: #99CC67;
+    .btn-show {
+        background: #99CC67;
+        color: black;
     }
 
-    a[href*="new"] {
+    .btn-show:hover {
+        background: #6F4E37;
+        color: white;
+    }
+
+    .btn-edit {
+        background: #234d20;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #2e6b2e;
+    }
+
+    .btn-delete {
+        background: #6F4E37;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .btn-delete:hover {
+        background: #8b6348;
+    }
+
+    .btn-locked {
+        background-color: #bdc3c7;
+        color: #7f8c8d;
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .create-new-btn {
         display: inline-block;
         background-color: #234d20;
         color: #fff;
@@ -80,9 +208,10 @@
         display: block;
         width: fit-content;
         transition: background 0.3s ease;
+        text-decoration: none;
     }
 
-    a[href*="new"]:hover {
+    .create-new-btn:hover {
         background-color: #2e6b2e;
     }
 
@@ -91,12 +220,39 @@
         color: #777;
         font-style: italic;
     }
+
+    .delete-form {
+        display: inline;
+        margin: 0;
+    }
+
+    /* DataTable info text */
+    .dataTables_info {
+        color: #666;
+        font-size: 14px;
+    }
+
+    /* Center no records message */
+    td.dataTables_empty {
+        text-align: center;
+        color: #777;
+        font-style: italic;
+        padding: 30px !important;
+    }
 </style>
 
 <div class="content-wrapper">
-    <h1>Stock index</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-error">{{ message }}</div>
+    {% endfor %}
 
-    <table class="table">
+    <h1>📦 Stock Inventory</h1>
+
+    <table id="stockTable" class="table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -104,6 +260,7 @@
                 <th>Image</th>
                 <th>Quantity</th>
                 <th>Last Updated</th>
+                <th>Created By</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -119,21 +276,72 @@
                         <em>No image</em>
                     {% endif %}
                 </td>
-                <td>{{ stock.quantity }}</td>
-                <td>{{ stock.lastUpdated ? stock.lastUpdated|date('Y-m-d H:i:s') : '' }}</td>
+                <td><strong>{{ stock.quantity }}</strong></td>
+                <td>{{ stock.lastUpdated ? stock.lastUpdated|date('Y-m-d H:i') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_stock_show', {'id': stock.id}) }}">show</a>
-                    <a href="{{ path('app_stock_edit', {'id': stock.id}) }}">edit</a>
+                    {% if stock.createdBy %}
+                        <span class="badge {{ 'ROLE_ADMIN' in stock.createdBy.roles ? 'badge-admin' : 'badge-staff' }}">
+                            {{ 'ROLE_ADMIN' in stock.createdBy.roles ? '👑 ' : '👤 ' }}{{ stock.createdBy.username }}
+                        </span>
+                    {% else %}
+                        <span class="badge badge-unknown">Unknown</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('app_stock_show', {'id': stock.id}) }}" class="btn-action btn-show">👁️ show</a>
+                    
+                    {% set canEdit = is_granted('ROLE_ADMIN') or (stock.createdBy and stock.createdBy.id == app.user.id) %}
+                    
+                    {% if canEdit %}
+                        <a href="{{ path('app_stock_edit', {'id': stock.id}) }}" class="btn-action btn-edit">✏️ edit</a>
+                        <form method="post" action="{{ path('app_stock_delete', {'id': stock.id}) }}" class="delete-form" 
+                              onsubmit="return confirm('⚠️ Are you sure you want to delete this stock record?\n\nProduct: {{ stock.product ? stock.product.name : 'Unknown' }}\nQuantity: {{ stock.quantity }}\n\nThis action cannot be undone!');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ stock.id) }}">
+                            <button type="submit" class="btn-action btn-delete">🗑️ delete</button>
+                        </form>
+                    {% else %}
+                        <span class="btn-action btn-locked" title="You can only edit your own records">🔒 locked</span>
+                    {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="7">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_stock_new') }}">Create new</a>
+    <a href="{{ path('app_stock_new') }}" class="create-new-btn">+ Create new</a>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+$(document).ready(function() {
+    $('#stockTable').DataTable({
+        "order": [[0, "desc"]], // Sort by ID descending (newest first)
+        "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        "language": {
+            "search": "🔍 Search:",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ stocks",
+            "infoEmpty": "No stocks available",
+            "infoFiltered": "(filtered from _MAX_ total stocks)",
+            "zeroRecords": "No matching stock records found",
+            "emptyTable": "No stock records available in table",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        },
+        "columnDefs": [
+            { "orderable": false, "targets": [2, 6] } // Disable sorting on Image and Actions columns
+        ]
+    });
+});
+</script>
 {% endblock %}

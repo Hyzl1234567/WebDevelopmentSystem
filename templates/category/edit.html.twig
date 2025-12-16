@@ -1,4 +1,4 @@
- {% extends 'base.html.twig' %}
+ {% extends 'dashboard/layout.html.twig' %}
 
 {% block title %}Edit Category{% endblock %}
 
@@ -27,6 +27,26 @@
         font-weight: bold;
     }
 
+    /* Flash messages */
+    .alert {
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
     label {
         display: block;
         text-align: left;
@@ -45,6 +65,7 @@
         outline: none;
         font-size: 16px;
         transition: all 0.3s ease;
+        box-sizing: border-box;
     }
 
     input[type="text"]:focus, textarea:focus {
@@ -82,36 +103,90 @@
     }
 
     .btn-back {
-        background-color: #2e5d24;
+        background-color: #99CC67;
+        color: #1D4A23;
     }
 
     .btn-delete {
-        background-color: #2e5d24;
+        background-color: #6F4E37;
+    }
+
+    .delete-form {
+        display: inline;
+        margin: 0;
+    }
+
+    /* Badge for creator info */
+    .creator-info {
+        background-color: #f0f8ff;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #2e5d24;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .badge-admin {
+        background-color: #9b59b6;
+    }
+
+    .badge-staff {
+        background-color: #3498db;
     }
 </style>
 
 <div class="form-container">
-    <h1>Edit Category</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-error">{{ message }}</div>
+    {% endfor %}
+
+    <h1>✏️ Edit Category</h1>
+
+    {% if category.createdBy %}
+        <div class="creator-info">
+            Created by: 
+            <span class="badge {{ 'ROLE_ADMIN' in category.createdBy.roles ? 'badge-admin' : 'badge-staff' }}">
+                {{ 'ROLE_ADMIN' in category.createdBy.roles ? '👑 ' : '👤 ' }}{{ category.createdBy.username }}
+            </span>
+        </div>
+    {% endif %}
 
     {# UPDATE FORM #}
     {{ form_start(form, {'attr': {'id': 'update-form'}}) }}
         {{ form_row(form.name) }}
         {{ form_row(form.description) }}
         <div class="button-group">
-            <a href="{{ path('app_category_index') }}" class="btn btn-back"><- Back</a>
-            <button type="submit" class="btn btn-update">Update</button>
+            <a href="{{ path('app_category_index') }}" class="btn btn-back">← Back</a>
+            <button type="submit" class="btn btn-update">💾 Update</button>
         </div>
     {{ form_end(form) }}
 
-    {# DELETE FORM (SEPARATE) #}
-    <div class="button-group" style="margin-top: 10px;">
-        <form method="post"
-              action="{{ path('app_category_delete', {'id': category.id}) }}"
-              onsubmit="return confirm('Are you sure you want to delete this category?');"
-              style="display:inline; margin:0;">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
-            <button type="submit" class="btn btn-delete">Delete</button>
-        </form>
-    </div>
+    {# DELETE FORM (SEPARATE) - Only show if user has permission #}
+    {% set canDelete = is_granted('ROLE_ADMIN') or (category.createdBy and category.createdBy.id == app.user.id) %}
+    
+    {% if canDelete %}
+        <div class="button-group" style="margin-top: 20px;">
+            <form method="post"
+                  action="{{ path('app_category_delete', {'id': category.id}) }}"
+                  class="delete-form"
+                  onsubmit="return confirm('⚠️ Are you sure you want to delete this category?\n\nCategory: {{ category.name }}\n\nThis action cannot be undone!');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+                <button type="submit" class="btn btn-delete">🗑️ Delete Category</button>
+            </form>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

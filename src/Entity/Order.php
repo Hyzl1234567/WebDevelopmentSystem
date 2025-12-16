@@ -19,16 +19,32 @@ class Order
     private ?Product $product = null;
 
     #[ORM\Column]
+    private ?int $quantity = null;
+
+    #[ORM\Column]
     private ?float $totalPrice = null;
 
     #[ORM\Column(length: 255)]
     private ?string $status = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $customer = null;
+    // UPDATED: Changed from string to Customer entity relationship
+    #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Customer $customer = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $createdBy = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->status = 'Pending';
+        $this->quantity = 1;
+    }
 
     public function getId(): ?int
     {
@@ -43,6 +59,20 @@ class Order
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
+        $this->calculateTotalPrice();
+
+        return $this;
+    }
+
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(int $quantity): static
+    {
+        $this->quantity = $quantity;
+        $this->calculateTotalPrice();
 
         return $this;
     }
@@ -57,6 +87,13 @@ class Order
         $this->totalPrice = $totalPrice;
 
         return $this;
+    }
+
+    private function calculateTotalPrice(): void
+    {
+        if ($this->product && $this->quantity) {
+            $this->totalPrice = $this->product->getPrice() * $this->quantity;
+        }
     }
 
     public function getStatus(): ?string
@@ -83,21 +120,29 @@ class Order
         return $this;
     }
 
-    public function getCustomer(): ?string
+    // UPDATED: Return type changed from string to Customer entity
+    public function getCustomer(): ?Customer
     {
         return $this->customer;
     }
 
-    public function setCustomer(string $customer): static
+    // UPDATED: Parameter type changed from string to Customer entity
+    public function setCustomer(?Customer $customer): static
     {
         $this->customer = $customer;
 
         return $this;
     }
 
-    public function __construct()
-{
-    $this->createdAt = new \DateTimeImmutable();
-    $this->status = 'Pending'; // Set default status
-}
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
 }

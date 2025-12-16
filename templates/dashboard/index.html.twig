@@ -7,7 +7,7 @@
 /* --- Dashboard Summary Cards --- */
 .dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* 4 cards per row */
   gap: 20px;
   margin-bottom: 40px;
 }
@@ -48,13 +48,18 @@
   color: #2d4d22;
 }
 
-
 .card.green { border-left: 6px solid #2d572c; }
 .card.orange { border-left: 6px solid #ff9f1c; }
 .card.red { border-left: 6px solid #d62828; }
 .card.blue { border-left: 6px solid #007bff; }
 .card.purple { border-left: 6px solid #6f42c1; }
 .card.teal { border-left: 6px solid #20c997; }
+.card.indigo { border-left: 6px solid #6610f2; }
+
+
+.card.manage-users {
+  grid-column: span 2; 
+}
 
 .card a {
   text-decoration: none;
@@ -63,8 +68,26 @@
   height: 100%;
 }
 
-/* --- Recent Activities --- */
-.activities-section {
+@media (max-width: 1200px) {
+  .dashboard-cards {
+    grid-template-columns: repeat(3, 1fr); /* 3 cards per row on medium screens */
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboard-cards {
+    grid-template-columns: repeat(2, 1fr); /* 2 cards per row on small screens */
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-cards {
+    grid-template-columns: 1fr; /* 1 card per row on extra small screens */
+  }
+}
+
+/* --- Recent Activities Section (Enhanced) --- */
+.recent-activities-section {
   background: #fff;
   border-radius: 16px;
   padding: 25px;
@@ -72,63 +95,139 @@
   margin-bottom: 40px;
 }
 
-.activities-section h2 {
-  color: #2d4d22;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #99CC67;
-  padding-bottom: 10px;
-}
-
-.activity-item {
+.section-header {
   display: flex;
-  align-items: start;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #99CC67;
+}
+
+.section-header h2 {
+  color: #2d4d22;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.view-all-btn {
+  background-color: #2d4d22;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.view-all-btn:hover {
+  background-color: #1D4A23;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(29, 74, 35, 0.3);
+}
+
+.activities-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.activities-table thead {
+  background-color: #f8f9fa;
+}
+
+.activities-table th {
   padding: 12px;
-  border-bottom: 1px solid #eee;
-  transition: background 0.2s;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.activity-item:hover {
-  background: #f8f9fa;
+.activities-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #333;
 }
 
-.activity-item:last-child {
+.activities-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.activities-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.activity-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 15px;
-  flex-shrink: 0;
-}
-
-.activity-icon.create { background: #d4edda; color: #155724; }
-.activity-icon.update { background: #fff3cd; color: #856404; }
-.activity-icon.delete { background: #f8d7da; color: #721c24; }
-.activity-icon.login { background: #cfe2ff; color: #084298; }
-
-.activity-content {
-  flex: 1;
-}
-
-.activity-user {
+.activity-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: #2d4d22;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.activity-description {
+.badge-create {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.badge-update {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.badge-delete {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.badge-login {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.badge-logout {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+
+.description-cell {
   color: #666;
-  font-size: 14px;
-  margin: 3px 0;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.activity-time {
-  font-size: 12px;
+.timestamp-cell {
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.no-activities {
+  text-align: center;
+  padding: 40px 20px;
   color: #999;
+}
+
+.no-activities-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.no-activities p {
+  margin: 0;
+  font-size: 15px;
 }
 
 /* --- Category Cards --- */
@@ -183,97 +282,112 @@
 
   <!-- Dashboard Stats -->
   <div class="dashboard-cards mb-5">
-    <div class="card green">
-      <i class="fas fa-users"></i>
-      <h3>Total Users</h3>
-      <p>{{ totalUsers }}</p>
-    </div>
-    <div class="card purple">
-      <i class="fas fa-user-shield"></i>
-      <h3>Total Admins</h3>
-      <p>{{ totalAdmins }}</p>
-    </div>
-    <div class="card teal">
-      <i class="fas fa-user-tie"></i>
-      <h3>Total Staff</h3>
-      <p>{{ totalStaff }}</p>
-    </div>
-    <div class="card orange">
-      <i class="fas fa-mug-hot"></i>
-      <h3>Total Products</h3>
-      <p>{{ totalProducts }}</p>
-    </div>
-    <div class="card blue">
-      <i class="fas fa-tags"></i>
-      <h3>Categories</h3>
-      <p>{{ totalCategories }}</p>
-    </div>
-    <div class="card red">
-      <i class="fas fa-boxes"></i>
-      <h3>Stock Items</h3>
-      <p>{{ totalStocks }}</p>
-    </div>
-    <div class="card purple">
-  <i class="fas fa-database"></i>
-  <h3>Total Records</h3>
-  <p>{{ totalRecords }}</p>
-</div>
-    <div class="card blue">
+    <div class="card blue manage-users">
       <a href="/admin/users/">
         <i class="fas fa-users-cog"></i>
         <h3>Manage Users</h3>
         <p>Click to manage</p>
       </a>
     </div>
-  </div>
 
-  <!-- Recent Activities -->
-  <div class="activities-section">
-    <h2><i class="fas fa-history"></i> Recent Activities</h2>
+    <div class="card green">
+      <i class="fas fa-users"></i>
+      <h3>Total Users</h3>
+      <p>{{ totalUsers }}</p>
+    </div>
+    
+    <div class="card purple">
+      <i class="fas fa-user-shield"></i>
+      <h3>Total Admins</h3>
+      <p>{{ totalAdmins }}</p>
+    </div>
+    
+    <div class="card teal">
+      <i class="fas fa-user-tie"></i>
+      <h3>Total Staff</h3>
+      <p>{{ totalStaff }}</p>
+    </div>
+    
+    <div class="card orange">
+      <i class="fas fa-mug-hot"></i>
+      <h3>Total Products</h3>
+      <p>{{ totalProducts }}</p>
+    </div>
+    
+    <div class="card blue">
+      <i class="fas fa-tags"></i>
+      <h3>Categories</h3>
+      <p>{{ totalCategories }}</p>
+    </div>
+    
+    <div class="card red">
+      <i class="fas fa-boxes"></i>
+      <h3>Stock Items</h3>
+      <p>{{ totalStocks }}</p>
+    </div>
+  </div>
+  
+  <!-- Recent Activities (Enhanced with View All Link) -->
+  <div class="recent-activities-section">
+    <div class="section-header">
+      <h2><i class="fas fa-history"></i> Recent Activity</h2>
+      <a href="{{ path('app_activity_log_index') }}" class="view-all-btn">
+        View All Logs
+        <span>→</span>
+      </a>
+    </div>
+
     {% if recentActivities|length > 0 %}
-      {% for activity in recentActivities %}
-        <div class="activity-item">
-          <div class="activity-icon {{ activity.action|lower }}">
-            {% if activity.action == 'create' %}
-              <i class="fas fa-plus"></i>
-            {% elseif activity.action == 'update' %}
-              <i class="fas fa-edit"></i>
-            {% elseif activity.action == 'delete' %}
-              <i class="fas fa-trash"></i>
-            {% elseif activity.action == 'login' %}
-              <i class="fas fa-sign-in-alt"></i>
-            {% else %}
-              <i class="fas fa-info"></i>
-            {% endif %}
-          </div>
-          <div class="activity-content">
-            <div class="activity-user">
-              {{ activity.user ? activity.user.username : 'System' }}
-            </div>
-            <div class="activity-description">
-              {{ activity.description ?? (activity.action ~ ' ' ~ activity.entity ~ ' #' ~ activity.entityId) }}
-            </div>
-            <div class="activity-time">
-              {{ activity.createdAt|date('Y-m-d H:i:s') }}
-            </div>
-          </div>
-        </div>
-      {% endfor %}
+      <table class="activities-table">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Entity</th>
+            <th>Description</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in recentActivities %}
+            <tr>
+              <td class="timestamp-cell">
+                {% if log.user %}
+                  {{ log.user.id }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="user-cell">
+                {% if log.user %}
+                  {{ log.user.username }}
+                {% else %}
+                  <span class="system-user">System</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="activity-badge badge-{{ log.action }}">
+                  {{ log.action }}
+                </span>
+              </td>
+              <td>{{ log.entity ?? '—' }}</td>
+              <td class="description-cell" title="{{ log.description }}">
+                {{ log.description|slice(0, 50) }}{% if log.description|length > 50 %}...{% endif %}
+              </td>
+              <td class="timestamp-cell">
+                {{ log.createdAt|date('M d, H:i') }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     {% else %}
-      <p style="text-align: center; color: #999; padding: 20px;">No recent activities</p>
-    {% endif %}
-  </div>
-
-  <!-- Product Categories -->
-  <h2 class="mb-4 text-center fw-bold">Product Categories</h2>
-  <div class="category-grid">
-    {% for category in categories %}
-      <div class="category-card">
-        <img src="{{ asset('image/' ~ category.image) }}" alt="{{ category.name }}" class="category-img">
-        <h5 class="category-title">{{ category.name }}</h5>
-        <p class="category-text">{{ category.description }}</p>
+      <div class="no-activities">
+        <div class="no-activities-icon">📭</div>
+        <p>No recent activities to display</p>
       </div>
-    {% endfor %}
+    {% endif %}
   </div>
 </div>
 

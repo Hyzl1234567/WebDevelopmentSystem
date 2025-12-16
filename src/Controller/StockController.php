@@ -14,9 +14,16 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/stock')]
-#[IsGranted('ROLE_STAFF')] // Ensure only staff/admin can access
+#[IsGranted('ROLE_USER')] // Staff and Admin can access
 class StockController extends AbstractController
 {
+    private ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     #[Route('/', name: 'app_stock_index', methods: ['GET'])]
     public function index(Request $request, StockRepository $stockRepository): Response
     {
@@ -39,13 +46,16 @@ class StockController extends AbstractController
     }
 
     #[Route('/new', name: 'app_stock_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, ActivityLogger $activityLogger): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $stock = new Stock();
         $form = $this->createForm(StockType::class, $stock);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Set who created this stock record
+            $stock->setCreatedBy($this->getUser());
+            
             $entityManager->persist($stock);
             $entityManager->flush();
 
@@ -65,16 +75,16 @@ class StockController extends AbstractController
                 $entityManager->flush();
             }
 
-            // LOG: Staff/Admin creates stock
-            $activityLogger->log(
+            // Log the activity
+            $this->activityLogger->logCreate(
                 $this->getUser(),
-                'create',
                 'Stock',
                 $stock->getId(),
-                sprintf('%s added stock: %d units of %s', 
-                    in_array('ROLE_ADMIN', $this->getUser()->getRoles()) ? 'Admin' : 'Staff',
-                    $stock->getQuantity(),
-                    $product ? $product->getName() : 'Unknown'
+                sprintf(
+                    '#%d - Product: %s, Qty: %d',
+                    $stock->getId(),
+                    $product ? $product->getName() : 'Unknown',
+                    $stock->getQuantity()
                 )
             );
 
@@ -97,8 +107,14 @@ class StockController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_stock_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Stock $stock, EntityManagerInterface $entityManager, StockRepository $stockRepository, ActivityLogger $activityLogger): Response
+    public function edit(Request $request, Stock $stock, EntityManagerInterface $entityManager, StockRepository $stockRepository): Response
     {
+        // Check if user can edit this stock record
+        if (!$this->canEditOrDelete($stock)) {
+            $this->addFlash('error', 'You do not have permission to edit this stock record. You can only edit your own records.');
+            return $this->redirectToRoute('app_stock_index');
+        }
+
         $oldQuantity = $stock->getQuantity();
         
         $form = $this->createForm(StockType::class, $stock);
@@ -124,14 +140,14 @@ class StockController extends AbstractController
                 $entityManager->flush();
             }
 
-            // LOG: Staff/Admin updates stock
-            $activityLogger->log(
+            // Log the activity
+            $this->activityLogger->logUpdate(
                 $this->getUser(),
-                'update',
                 'Stock',
                 $stock->getId(),
-                sprintf('%s updated stock: %s (quantity: %d → %d units)', 
-                    in_array('ROLE_ADMIN', $this->getUser()->getRoles()) ? 'Admin' : 'Staff',
+                sprintf(
+                    '#%d - Product: %s (Qty: %d → %d)',
+                    $stock->getId(),
                     $product ? $product->getName() : 'Unknown',
                     $oldQuantity,
                     $newQuantity
@@ -149,24 +165,30 @@ class StockController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_stock_delete', methods: ['POST'])]
-    public function delete(Request $request, Stock $stock, EntityManagerInterface $entityManager, ActivityLogger $activityLogger): Response
+    public function delete(Request $request, Stock $stock, EntityManagerInterface $entityManager): Response
     {
+        // Check if user can delete this stock record
+        if (!$this->canEditOrDelete($stock)) {
+            $this->addFlash('error', 'You do not have permission to delete this stock record. You can only delete your own records.');
+            return $this->redirectToRoute('app_stock_index');
+        }
+
         if ($this->isCsrfTokenValid('delete' . $stock->getId(), $request->request->get('_token'))) {
             $product = $stock->getProduct();
             $stockQuantity = $stock->getQuantity();
             $stockId = $stock->getId();
             $productName = $product ? $product->getName() : 'Unknown';
 
-            // LOG BEFORE DELETION: Staff/Admin deletes stock
-            $activityLogger->log(
+            // Log before deletion
+            $this->activityLogger->logDelete(
                 $this->getUser(),
-                'delete',
                 'Stock',
                 $stockId,
-                sprintf('%s deleted stock: %d units of %s', 
-                    in_array('ROLE_ADMIN', $this->getUser()->getRoles()) ? 'Admin' : 'Staff',
-                    $stockQuantity,
-                    $productName
+                sprintf(
+                    '#%d - Product: %s, Qty: %d',
+                    $stockId,
+                    $productName,
+                    $stockQuantity
                 )
             );
 
@@ -193,5 +215,32 @@ class StockController extends AbstractController
         }
 
         return $this->redirectToRoute('app_stock_index');
+    }
+
+    /**
+     * Check if the current user can edit or delete the stock record
+     * - Admin can edit/delete all records
+     * - Staff can only edit/delete their own records
+     */
+    private function canEditOrDelete(Stock $stock): bool
+    {
+        $currentUser = $this->getUser();
+        
+        // If no creator is set, allow access (for legacy records)
+        if (!$stock->getCreatedBy()) {
+            return true;
+        }
+
+        // Admin can edit/delete everything
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+            return true;
+        }
+
+        // Staff can only edit/delete their own records
+        if (in_array('ROLE_STAFF', $currentUser->getRoles())) {
+            return $stock->getCreatedBy() === $currentUser;
+        }
+
+        return false;
     }
 }

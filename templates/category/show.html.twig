@@ -6,7 +6,7 @@
 
 <style>
     body {
-        background-color: #99CC67; 
+        background-color: #99CC67;
         font-family: Arial, sans-serif;
     }
 
@@ -52,11 +52,35 @@
         color: #333;
     }
 
+    /* Badge styling */
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .badge-admin {
+        background-color: #9b59b6;
+    }
+
+    .badge-staff {
+        background-color: #3498db;
+    }
+
+    .badge-unknown {
+        background-color: #95a5a6;
+    }
+
     /* Button container */
     .button-group {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     /* Buttons */
@@ -101,10 +125,24 @@
         color: white;
     }
 
+    .warning-message {
+        padding: 15px;
+        background-color: #fff3cd;
+        border-radius: 8px;
+        color: #856404;
+        font-size: 14px;
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    .delete-form {
+        display: inline;
+        margin: 0;
+    }
 </style>
 
 <div class="details-container">
-    <h2>Category Details</h2>
+    <h2>☘️ Category Details</h2>
 
     <table>
         <tbody>
@@ -120,14 +158,50 @@
                 <th>Description</th>
                 <td>{{ category.description }}</td>
             </tr>
+            <tr>
+                <th>Created At</th>
+                <td>{{ category.createdAt ? category.createdAt|date('F d, Y - H:i:s') : '—' }}</td>
+            </tr>
+            <tr>
+                <th>Created By</th>
+                <td>
+                    {% if category.createdBy %}
+                        <span class="badge {{ 'ROLE_ADMIN' in category.createdBy.roles ? 'badge-admin' : 'badge-staff' }}">
+                            {{ 'ROLE_ADMIN' in category.createdBy.roles ? '👑 Admin' : '👤 Staff' }} - {{ category.createdBy.username }}
+                        </span>
+                    {% else %}
+                        <span class="badge badge-unknown">Unknown</span>
+                    {% endif %}
+                </td>
+            </tr>
         </tbody>
     </table>
 
     <div class="button-group">
-        <a href="{{ path('app_category_index') }}" class="back-btn">Back to List</a>
-        <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="edit-btn">Edit</a>
-        {{ include('category/_delete_form.html.twig', { 'button_label': 'Delete', 'attr': {'class': 'delete-btn'} }) }}
+        <a href="{{ path('app_category_index') }}" class="back-btn">← Back to List</a>
+        
+        {% set canEdit = is_granted('ROLE_ADMIN') or (category.createdBy and category.createdBy.id == app.user.id) %}
+        
+        {% if canEdit %}
+            <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="edit-btn">✏️ Edit</a>
+            <form method="post" action="{{ path('app_category_delete', {'id': category.id}) }}" class="delete-form"
+                  onsubmit="return confirm('⚠️ Are you sure you want to delete this category?\n\nCategory: {{ category.name }}\n\nThis action cannot be undone!');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+                <button type="submit" class="delete-btn">🗑️ Delete</button>
+            </form>
+        {% endif %}
     </div>
+
+    {% if not canEdit %}
+        <div class="warning-message">
+            🔒 You can only edit or delete your own records. This category was created by 
+            {% if category.createdBy %}
+                <strong>{{ category.createdBy.username }}</strong>
+            {% else %}
+                <strong>another user</strong>
+            {% endif %}.
+        </div>
+    {% endif %}
 </div>
 
 {% endblock %}

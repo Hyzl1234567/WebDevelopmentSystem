@@ -1,0 +1,127 @@
+ {% extends 'base.html.twig' %}
+
+{% block title %}Create New User{% endblock %}
+
+{% block body %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        color: #2d4d22;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        color: #2d4d22;
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: #2d4d22;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        margin-right: 10px;
+    }
+
+    .btn-primary {
+        background-color: #2d4d22;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #3b5b2a;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .button-group {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="form-container">
+    <h1>Create New User</h1>
+
+    <form method="post">
+        <div class="form-group">
+            <label for="username">Username *</label>
+            <input type="text" name="username" id="username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email">
+        </div>
+
+        <div class="form-group">
+            <label for="full_name">Full Name</label>
+            <input type="text" name="full_name" id="full_name">
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role *</label>
+            <select name="role" id="role" required>
+                <option value="ROLE_USER">User</option>
+                <option value="ROLE_STAFF">Staff</option>
+                <option value="ROLE_ADMIN">Admin</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password *</label>
+            <input type="password" name="password" id="password" required minlength="6">
+            <small style="color: #666;">Minimum 6 characters</small>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Create User</button>
+            <a href="{{ path('app_user_index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

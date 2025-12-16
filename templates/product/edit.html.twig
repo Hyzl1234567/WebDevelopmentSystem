@@ -1,104 +1,187 @@
- {% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Edit Product{% endblock %}
 
 {% block body %}
-    <style>
-
-    body{
+<style>
+    body {
         background: #99CC67;
     }
 
+    .form-container {
+        width: 600px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,2);
+        font-family: Arial, sans-serif;
+    }
+
+    .form-container h1 {
+        text-align: center;
+        color: #6b4226;
+        margin-bottom: 10px;
+    }
+
+    /* Flash messages */
+    .alert {
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Creator info badge */
+    .creator-info {
+        background-color: #f0f8ff;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #2e5d24;
+        text-align: center;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .badge-admin {
+        background-color: #9b59b6;
+    }
+
+    .badge-staff {
+        background-color: #3498db;
+    }
+
     .readonly-field {
-    background-color: #f4f4f4;
-    color: #555;
-    border: 1px solid #ccc;
-    cursor: not-allowed;
-}
+        background-color: #f4f4f4;
+        color: #555;
+        border: 1px solid #ccc;
+        cursor: not-allowed;
+    }
 
-        .form-container {
-            width: 600px;
-            margin: 40px auto;
-            padding: 25px;
-            border-radius: 12px;
-            background: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,2);
-            font-family: Arial, sans-serif;
-        }
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
 
-        .form-container h1 {
-            text-align: center;
-            color: #6b4226;
-            margin-bottom: 20px;
-        }
+    label {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    input, textarea, select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
 
-        label {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
 
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-        }
- .form-actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-}
+    /* Unified button look */
+    button, .form-actions .btn, .form-actions form button {
+        background: #1D4A23;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
 
-/* Unified button look */
-button,
-.form-actions .btn,
-.form-actions form button {
-    background: #1D4A23;
-    color: white;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-    font-weight: bold;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-}
+    /* Hover effect */
+    button:hover, .form-actions .btn:hover, .form-actions form button:hover {
+        background: #99CC67;
+        color: black;
+    }
 
-/* Hover effect */
-button:hover,
-.form-actions .btn:hover,
-.form-actions form button:hover {
-    background: #99CC67;
-    color: black;
-}
+    .delete-form {
+        display: inline;
+        margin: 0;
+    }
 
+    .delete-form button {
+        background: #6F4E37;
+    }
 
-    </style>
+    .delete-form button:hover {
+        background: #8b6348;
+        color: white;
+    }
+</style>
 
-    <div class="form-container">
-    <h1>✏ Edit Product</h1>
+<div class="form-container">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-error">{{ message }}</div>
+    {% endfor %}
+
+    <h1>✏️ Edit Product</h1>
+
+    {% if product.createdBy %}
+        <div class="creator-info">
+            Created by: 
+            <span class="badge {{ 'ROLE_ADMIN' in product.createdBy.roles ? 'badge-admin' : 'badge-staff' }}">
+                {{ 'ROLE_ADMIN' in product.createdBy.roles ? '👑 ' : '👤 ' }}{{ product.createdBy.username }}
+            </span>
+        </div>
+    {% endif %}
 
     {# Update form (Update button stays inside here) #}
     {{ form_start(form) }}
         {{ form_widget(form) }}
-        <button type="submit">Update</button>
+        <button type="submit">💾 Update Product</button>
     {{ form_end(form) }}
 
-    {# Action buttons: Back + Delete #}
+    {# Action buttons: Back + Delete (only show if has permission) #}
     <div class="form-actions">
-        <a href="{{ path('app_product_index') }}" class="btn">Back</a>
-        {{ include('product/_delete_form.html.twig') }}
+        <a href="{{ path('app_product_index') }}" class="btn">← Back</a>
+        
+        {% set canDelete = is_granted('ROLE_ADMIN') or (product.createdBy and product.createdBy.id == app.user.id) %}
+        
+        {% if canDelete %}
+            <form method="post" action="{{ path('app_product_delete', {'id': product.id}) }}" class="delete-form"
+                  onsubmit="return confirm('⚠️ Are you sure you want to delete this product?\n\nProduct: {{ product.name }}\nPrice: ₱{{ product.price|number_format(2) }}\n\nThis action cannot be undone!');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                <button type="submit">🗑️ Delete Product</button>
+            </form>
+        {% endif %}
     </div>
 </div>
 

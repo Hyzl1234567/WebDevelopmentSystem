@@ -171,9 +171,9 @@
         </div>
 
         <div class="form-group">
-            {{ form_label(form.totalPrice, 'Total Price (₱)', {'label_attr': {'class': 'required'}}) }}
-            {{ form_widget(form.totalPrice, {'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'}}) }}
-            {{ form_errors(form.totalPrice) }}
+            {{ form_label(form.quantity, 'Quantity', {'label_attr': {'class': 'required'}}) }}
+            {{ form_widget(form.quantity, {'attr': {'class': 'form-control', 'placeholder': '1', 'min': '1'}}) }}
+            {{ form_errors(form.quantity) }}
         </div>
 
         <div class="form-group">

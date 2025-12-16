@@ -42,6 +42,11 @@
         color: #333;
     }
 
+    .order-badge.processing {
+        background-color: #3498db;
+        color: white;
+    }
+
     .order-badge.completed {
         background-color: #99CC67;
         color: #1D4A23;
@@ -81,6 +86,23 @@
         font-weight: bold;
     }
 
+    .creator-badge {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: white;
+    }
+
+    .creator-admin {
+        background-color: #9b59b6;
+    }
+
+    .creator-staff {
+        background-color: #3498db;
+    }
+
     .order-actions {
         display: flex;
         gap: 10px;
@@ -88,6 +110,7 @@
         margin-top: 30px;
         padding-top: 20px;
         border-top: 1px solid #ddd;
+        flex-wrap: wrap;
     }
 
     .btn {
@@ -149,22 +172,40 @@
         font-size: 18px;
     }
 
-    .product-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .product-info-table {
+        width: 100%;
+        border-collapse: collapse;
     }
 
-    .product-name {
-        font-size: 16px;
+    .product-info-table tr {
+        border-bottom: 1px solid #c8e6c9;
+    }
+
+    .product-info-table tr:last-child {
+        border-bottom: none;
+        border-top: 2px solid #1D4A23;
+    }
+
+    .product-info-table td {
+        padding: 12px 0;
+        font-size: 15px;
+    }
+
+    .product-info-table td:first-child {
+        color: #666;
         font-weight: 600;
-        color: #333;
+        width: 40%;
     }
 
-    .product-price {
-        font-size: 20px;
-        font-weight: bold;
+    .product-info-table td:last-child {
         color: #1D4A23;
+        font-weight: bold;
+        text-align: right;
+    }
+
+    .product-info-table tr:last-child td {
+        font-size: 18px;
+        padding-top: 15px;
     }
 
     .alert {
@@ -179,6 +220,17 @@
         color: #155724;
         border: 1px solid #c3e6cb;
     }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+        margin-top: 20px;
+    }
+
+    .alert-warning strong {
+        font-weight: bold;
+    }
 </style>
 
 <div class="order-detail-container">
@@ -191,14 +243,28 @@
         <span class="order-badge {{ order.status|lower }}">{{ order.status }}</span>
     </div>
 
-    <!-- Product Details -->
+    <!-- Product Details with Pricing Breakdown -->
     {% if order.product %}
     <div class="product-details">
-        <h3>📦 Product Information</h3>
-        <div class="product-info">
-            <span class="product-name">{{ order.product.name }}</span>
-            <span class="product-price">₱{{ order.totalPrice|number_format(2) }}</span>
-        </div>
+        <h3>📦 Product & Pricing Information</h3>
+        <table class="product-info-table">
+            <tr>
+                <td>Product Name:</td>
+                <td>{{ order.product.name }}</td>
+            </tr>
+            <tr>
+                <td>Unit Price:</td>
+                <td>₱{{ order.product.price|number_format(2) }}</td>
+            </tr>
+            <tr>
+                <td>Quantity:</td>
+                <td>{{ order.quantity }} {{ order.quantity > 1 ? 'units' : 'unit' }}</td>
+            </tr>
+            <tr>
+                <td><strong>Total Amount:</strong></td>
+                <td><strong>₱{{ order.totalPrice|number_format(2) }}</strong></td>
+            </tr>
+        </table>
     </div>
     {% endif %}
 
@@ -215,11 +281,6 @@
         </div>
 
         <div class="info-card">
-            <div class="info-label">Total Price</div>
-            <div class="info-value">₱{{ order.totalPrice|number_format(2) }}</div>
-        </div>
-
-        <div class="info-card">
             <div class="info-label">Order Status</div>
             <div class="info-value">{{ order.status }}</div>
         </div>
@@ -233,6 +294,19 @@
             <div class="info-label">Order Time</div>
             <div class="info-value">{{ order.createdAt ? order.createdAt|date('h:i A') : 'N/A' }}</div>
         </div>
+
+        <div class="info-card">
+            <div class="info-label">Created By</div>
+            <div class="info-value">
+                {% if order.createdBy %}
+                    <span class="creator-badge {{ 'ROLE_ADMIN' in order.createdBy.roles ? 'creator-admin' : 'creator-staff' }}">
+                        {{ 'ROLE_ADMIN' in order.createdBy.roles ? '👑 Admin' : '👤 Staff' }}<br>{{ order.createdBy.username }}
+                    </span>
+                {% else %}
+                    <span style="color: #999;">Unknown</span>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <!-- Actions -->
@@ -240,13 +314,29 @@
         <a href="{{ path('app_order_index') }}" class="btn btn-secondary">
             ← Back to Orders
         </a>
-        <a href="{{ path('app_order_edit', {'id': order.id}) }}" class="btn btn-warning">
-            ✏️ Edit Order
-        </a>
-        <form method="post" action="{{ path('app_order_delete', {'id': order.id}) }}" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this order?');">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ order.id) }}">
-            <button type="submit" class="btn btn-danger">🗑️ Delete Order</button>
-        </form>
+        
+        {% set canEdit = is_granted('ROLE_ADMIN') or (order.createdBy and order.createdBy.id == app.user.id) %}
+        
+        {% if canEdit %}
+            <a href="{{ path('app_order_edit', {'id': order.id}) }}" class="btn btn-warning">
+                ✏️ Edit Order
+            </a>
+            <form method="post" action="{{ path('app_order_delete', {'id': order.id}) }}" class="delete-form" onsubmit="return confirm('⚠️ Are you sure you want to delete this order?\n\nOrder #{{ order.id }}\nCustomer: {{ order.customer }}\n\nThis action cannot be undone!');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ order.id) }}">
+                <button type="submit" class="btn btn-danger">🗑️ Delete Order</button>
+            </form>
+        {% endif %}
     </div>
+
+    {% if not canEdit %}
+        <div class="alert alert-warning">
+            🔒 <strong>Permission Notice:</strong> You can only edit or delete your own records. This order was created by 
+            {% if order.createdBy %}
+                <strong>{{ order.createdBy.username }}</strong>
+            {% else %}
+                <strong>another user</strong>
+            {% endif %}.
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

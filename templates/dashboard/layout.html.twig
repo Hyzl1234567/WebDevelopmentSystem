@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -97,7 +96,7 @@ body {
     background-color: #4e8744;
 }
 
-/* Ensure main content doesn’t overlap */
+/* Ensure main content doesn't overlap */
 .content {
     margin-left: 80px;
     transition: margin-left 0.3s ease;
@@ -395,6 +394,70 @@ body {
   }
 }
 
+/* User Info Display */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    border: 1px solid #d3d3d3;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.user-info:hover {
+    background-color: #e0e0e0;
+    border-color: #2d4d22;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-info i {
+    color: #2d4d22;
+    font-size: 18px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #2d4d22;
+    font-size: 14px;
+    margin: 0;
+}
+
+.user-role {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+}
+
+.user-role-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-admin {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.role-staff {
+    background-color: #4ecdc4;
+    color: white;
+}
+
 </style>
 
 
@@ -403,13 +466,6 @@ body {
      <!-- Sidebar -->
 <aside class="sidebar">
     <ul class="nav-list">
-
-     <li>
-            <a href="{{ path('app_profile') }}">
-                <i class="fas fa-user"></i>
-                <span class="nav-text">My Profile</span>
-            </a>
-        </li>
 
         <li>
             <a href="{{ path('app_dashboard') }}">
@@ -448,24 +504,14 @@ body {
         <span class="nav-text">Categories</span>
     </a>
 </li>
-        <li>
-            <a href="#">
-                <i class="fas fa-star"></i>
-                <span class="nav-text">Reviews</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="fas fa-ticket-alt"></i>
-                <span class="nav-text">Coupons</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="fas fa-bell"></i>
-                <span class="nav-text">Notifications</span>
-            </a>
-        </li>
+
+<li>
+    <a href="{{ path('app_customer_index') }}">
+        <i class="fas fa-tags"></i>
+        <span class="nav-text">Customers</span>
+    </a>
+</li>
+        
     </ul>
 </aside>
 
@@ -476,28 +522,33 @@ body {
         <header class="header">
 
             <div class="logo">
-    <img src="{{ asset('image/Logo_Brand.png') }}" alt="EcoBrew Logo" class="logo-img">
+    <img src="{{ asset('image/logo.png') }}" alt="EcoBrew Logo" class="logo-img">
 </div>
 
 <div class="system-banner">
-    <h2>☕ Review-to-Coupon Ordering System 🌿</h2>
+    <h2>☕ Nature in Every Cup 🌿</h2>
 </div>
 
-  <div class="search-logout">
-    <form method="get" action="{{ path('app_stock_index') }}" class="search-form">
-        <input type="text" name="q" placeholder="Search Product..." value="{{ app.request.get('q') }}">
-         <button type="submit" class="search-btn">
-    <i class="fas fa-search"></i>
-</button>
-    </form>
+<div class="search-logout">
+    <!-- User Info Display - Now Clickable -->
+    <a href="{{ path('app_profile') }}" class="user-info" title="Go to My Profile">
+        <i class="fas fa-user-circle"></i>
+        <div class="user-details">
+            <p class="user-name">{{ app.user.username }}</p>
+            <p class="user-role">
+                {% if 'ROLE_ADMIN' in app.user.roles %}
+                    <span class="user-role-badge role-admin">Admin</span>
+                {% elseif 'ROLE_STAFF' in app.user.roles %}
+                    <span class="user-role-badge role-staff">Staff</span>
+                {% endif %}
+            </p>
+        </div>
+    </a>
 
     <form action="{{ path('app_logout') }}" method="post" onsubmit="return confirm('⚠Are you sure you want to log out?');">
         <button type="submit" class="logout">Logout</button>
     </form>
 </div>
-
-
-
 
         </header>
 

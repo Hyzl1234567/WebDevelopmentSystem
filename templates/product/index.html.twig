@@ -2,13 +2,8 @@
 
 {% block title %}Product index{% endblock %}
 
-{% block stylesheets %}
+{% block body %}
 <style>
-    body {
-        background-color: #fff; 
-        font-family: Arial, sans-serif;
-    }
-
     .container {
         max-width: 1400px;
         margin: 30px auto;
@@ -18,20 +13,143 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    /* Override DataTables default header styling */
-    table.dataTable thead th {
+    h1 {
+        text-align: center;
+        color: #1D4A23;
+        font-size: 2rem;
+        margin-bottom: 25px;
+    }
+
+    /* Flash messages */
+    .alert {
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* DataTable wrapper styling */
+    .dataTables_wrapper {
+        padding: 20px 0;
+    }
+
+    /* DataTable search box */
+    .dataTables_filter input {
+        border: 2px solid #1D4A23;
+        border-radius: 6px;
+        padding: 6px 12px;
+        margin-left: 8px;
+    }
+
+    /* DataTable length selector */
+    .dataTables_length select {
+        border: 2px solid #1D4A23;
+        border-radius: 6px;
+        padding: 4px 8px;
+        margin: 0 8px;
+    }
+
+    /* DataTable pagination */
+    .dataTables_paginate .paginate_button {
+        padding: 6px 12px;
+        margin: 0 2px;
+        border-radius: 6px;
+        border: 1px solid #1D4A23;
+        background: white;
+        color: #1D4A23 !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
         background: #1D4A23 !important;
         color: white !important;
-        padding: 12px !important;
-        border-bottom: none !important;
+        border: 1px solid #1D4A23;
     }
 
-    table.dataTable tbody td {
-        padding: 10px;
+    .dataTables_paginate .paginate_button.current {
+        background: #1D4A23 !important;
+        color: white !important;
+        border: 1px solid #1D4A23;
     }
 
-    table.dataTable tbody tr:hover {
+    .dataTables_paginate .paginate_button.disabled {
+        color: #ccc !important;
+    }
+
+    /* DataTable info text */
+    .dataTables_info {
+        color: #666;
+        font-size: 14px;
+    }
+
+    /* Table styling */
+    table {
+        width: 100% !important;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    thead {
+        background: #1D4A23;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tbody tr:hover {
         background-color: #f9f9f9;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    table img {
+        max-width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Badge for Created By */
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .badge-admin {
+        background-color: #9b59b6;
+    }
+
+    .badge-staff {
+        background-color: #3498db;
+    }
+
+    .badge-unknown {
+        background-color: #95a5a6;
     }
 
     /* Action buttons */
@@ -46,6 +164,7 @@
         transition: 0.3s;
         border: none;
         cursor: pointer;
+        white-space: nowrap;
     }
 
     .btn-show {
@@ -68,6 +187,22 @@
         color: black;
     }
 
+    .btn-delete {
+        background: #6F4E37;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #8b6348;
+    }
+
+    .btn-locked {
+        background-color: #bdc3c7;
+        color: #7f8c8d;
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
     .btn-add {
         display: inline-block;
         padding: 10px 20px;
@@ -83,16 +218,52 @@
         background: #1D4A23;
         color: white;
     }
-</style>
-{% endblock %}
 
-{% block body %}
+    .delete-form {
+        display: inline;
+        margin: 0;
+    }
+
+    .no-records {
+        text-align: center;
+        color: #777;
+        font-style: italic;
+    }
+
+    /* Center no records message */
+    td.dataTables_empty {
+        text-align: center;
+        color: #777;
+        font-style: italic;
+        padding: 30px !important;
+    }
+
+    /* Category badge */
+    .category-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        background-color: #99CC67;
+        color: #1D4A23;
+    }
+</style>
+
 <div class="container">
-    <h1>Product List</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
     
-    <a class="btn-add" href="{{ path('app_product_new') }}">+ Add New Menu Item</a>
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-error">{{ message }}</div>
+    {% endfor %}
+
+    <h1>📦 Product List</h1>
     
-    <table id="productTable" class="display" style="width:100%">               
+    <a class="btn-add" href="{{ path('app_product_new') }}">+ Add New Product</a>
+    
+    <table id="productsTable">               
         <thead>
             <tr>
                 <th>Id</th>
@@ -100,9 +271,9 @@
                 <th>Image</th>
                 <th>Category</th>
                 <th>Description</th>
-                <th>Size</th>
                 <th>Quantity</th>
                 <th>Price</th>
+                <th>Created By</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -110,27 +281,49 @@
         {% for product in products %}
             <tr>
                 <td>{{ product.id }}</td>
-                <td>{{ product.name }}</td>
+                <td><strong>{{ product.name }}</strong></td>
                 <td>
                     {% if product.image %}
-                        <img src="{{ asset('uploads/images/' ~ product.image) }}" alt="{{ product.name }}" style="max-width: 80px; height: auto;">
+                        <img src="{{ asset('uploads/images/' ~ product.image) }}" alt="{{ product.name }}">
                     {% else %}
-                        No image
+                        <em>No image</em>
                     {% endif %}
                 </td>
-                <td>{{ product.category }}</td>
-                <td>{{ product.description }}</td>
-                <td>{{ product.size }}</td>
-                <td>{{ product.quantity }}</td>
-                <td>₱{{ product.price }}</td>
                 <td>
-                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-action btn-show">Show</a>
-                    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-action btn-edit">Edit</a>
+                    <span class="category-badge">{{ product.category }}</span>
+                </td>
+                <td>{{ product.description|slice(0, 50) }}{{ product.description|length > 50 ? '...' : '' }}</td>
+                <td><strong>{{ product.quantity }}</strong></td>
+                <td><strong>₱{{ product.price|number_format(2, '.', ',') }}</strong></td>
+                <td>
+                    {% if product.createdBy %}
+                        <span class="badge {{ 'ROLE_ADMIN' in product.createdBy.roles ? 'badge-admin' : 'badge-staff' }}">
+                            {{ 'ROLE_ADMIN' in product.createdBy.roles ? '👑 ' : '👤 ' }}{{ product.createdBy.username }}
+                        </span>
+                    {% else %}
+                        <span class="badge badge-unknown">Unknown</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-action btn-show">👁️ Show</a>
+                    
+                    {% set canEdit = is_granted('ROLE_ADMIN') or (product.createdBy and product.createdBy.id == app.user.id) %}
+                    
+                    {% if canEdit %}
+                        <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-action btn-edit">✏️ Edit</a>
+                        <form method="post" action="{{ path('app_product_delete', {'id': product.id}) }}" class="delete-form" 
+                              onsubmit="return confirm('⚠️ Are you sure you want to delete this product?\n\nProduct: {{ product.name }}\nPrice: ₱{{ product.price|number_format(2) }}\n\nThis action cannot be undone!');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                            <button type="submit" class="btn-action btn-delete">🗑️ Delete</button>
+                        </form>
+                    {% else %}
+                        <span class="btn-action btn-locked" title="You can only edit your own records">🔒 Locked</span>
+                    {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="9">No records found</td>
+                <td colspan="9" class="no-records">No records found</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -139,33 +332,38 @@
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    <script>
-        $(document).ready(function() {
-            // Initialize DataTable
-            $('#productTable').DataTable({
-                "pageLength": 10,           // Show 10 rows per page
-                "order": [[0, "asc"]],      // Sort by ID column ascending
-                "columnDefs": [
-                    { 
-                        "orderable": false, 
-                        "targets": [2, 8]   // Disable sorting on Image and Actions columns
-                    }
-                ],
-                "language": {
-                    "search": "Search products:",
-                    "lengthMenu": "Show _MENU_ products per page",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ products",
-                    "paginate": {
-                        "first": "First",
-                        "last": "Last",
-                        "next": "Next",
-                        "previous": "Previous"
-                    }
-                }
-            });
-            
-            console.log('DataTable initialized successfully!');
-        });
-    </script>
+<script>
+$(document).ready(function() {
+    $('#productsTable').DataTable({
+        "order": [[0, "desc"]], // Sort by ID descending (newest first)
+        "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        "language": {
+            "search": "🔍 Search:",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ products",
+            "infoEmpty": "No products available",
+            "infoFiltered": "(filtered from _MAX_ total products)",
+            "zeroRecords": "No matching products found",
+            "emptyTable": "No products available in table",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        },
+        "columnDefs": [
+            { 
+                "orderable": false, 
+                "targets": [2, 8] // Disable sorting on Image and Actions columns
+            },
+            {
+                "type": "num",
+                "targets": [5, 6] // Quantity and Price columns - for proper numeric sorting
+            }
+        ]
+    });
+});
+</script>
 {% endblock %}

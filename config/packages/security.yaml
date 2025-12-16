@@ -45,6 +45,7 @@ security:
         - { path: ^/dashboard, roles: ROLE_ADMIN }
         - { path: ^/staff, roles: ROLE_STAFF }
         - { path: ^/product, roles: 'ROLE_ADMIN, ROLE_STAFF' } 
+        
 
     role_hierarchy: {  }
 

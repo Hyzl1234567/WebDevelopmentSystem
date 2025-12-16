@@ -3,70 +3,211 @@
 {% block title %}Edit Stock{% endblock %}
 
 {% block body %}
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #9ed36a;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #9ed36a;
+        margin: 0;
+        padding: 0;
+    }
 
-h1{
-text-align:center;
-}
+    .form-container {
+        background: #ffffff;
+        max-width: 500px;
+        margin: 60px auto;
+        padding: 35px 30px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        text-align: left;
+    }
 
-        .form-container {
-            background: #ffffff;
-            max-width: 420px;
-            margin: 60px auto;
-            padding: 35px 30px;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-            text-align: left;
-        }
+    h1 {
+        color: #1f441e;
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
 
-        h1 {
-            color: #1f441e;
-            font-size: 30px;
-            font-weight: bold;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-        }
+    /* Flash messages */
+    .alert {
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
 
-        .delete-form {
-            margin-top: 0;
-        }
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
 
-        .delete-form form {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
 
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 25px;
-        }
+    /* Creator info badge */
+    .creator-info {
+        background-color: #f0f8ff;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #1f441e;
+        text-align: center;
+    }
 
-        .form-actions .back-link,
-        .form-actions .btn,
-        .delete-form button {
-            flex: 1;
-            margin: 0 5px;
-            text-align: center;
-        }
-    </style>
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
 
-    <div class="form-container">
-        <h1>Edit Stock</h1>
-        {{ include('stock/_form.html.twig', {'button_label': 'Update'}) }}
+    .badge-admin {
+        background-color: #9b59b6;
+    }
 
-        <div class="delete-form">
-            {{ include('stock/_delete_form.html.twig') }}
+    .badge-staff {
+        background-color: #3498db;
+    }
+
+    /* Form styling */
+    form label {
+        display: block;
+        font-weight: bold;
+        color: #1f441e;
+        margin-bottom: 8px;
+        margin-top: 15px;
+    }
+
+    form input, form select, form textarea {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+
+    form input:focus, form select:focus, form textarea:focus {
+        outline: none;
+        border-color: #1f441e;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+        gap: 10px;
+    }
+
+    .form-actions .back-link,
+    .form-actions .btn {
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+        transition: 0.3s;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .back-link {
+        background: #bdc3c7;
+        color: #000;
+        flex: 1;
+    }
+
+    .back-link:hover {
+        background: #95a5a6;
+    }
+
+    .btn-update {
+        background: #1f441e;
+        color: white;
+        flex: 1;
+    }
+
+    .btn-update:hover {
+        background: #2e6b2e;
+    }
+
+    .delete-form {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #eee;
+        text-align: center;
+    }
+
+    .delete-form button {
+        background: #6F4E37;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+    }
+
+    .delete-form button:hover {
+        background: #8b6348;
+    }
+</style>
+
+<div class="form-container">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-error">{{ message }}</div>
+    {% endfor %}
+
+    <h1>✏️ Edit Stock</h1>
+
+    {% if stock.createdBy %}
+        <div class="creator-info">
+            Created by: 
+            <span class="badge {{ 'ROLE_ADMIN' in stock.createdBy.roles ? 'badge-admin' : 'badge-staff' }}">
+                {{ 'ROLE_ADMIN' in stock.createdBy.roles ? '👑 ' : '👤 ' }}{{ stock.createdBy.username }}
+            </span>
         </div>
-    </div>
+    {% endif %}
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        
+        <div class="form-actions">
+            <a href="{{ path('app_stock_index') }}" class="back-link">← Back</a>
+            <button type="submit" class="btn btn-update">💾 Update</button>
+        </div>
+    {{ form_end(form) }}
+
+    {% set canDelete = is_granted('ROLE_ADMIN') or (stock.createdBy and stock.createdBy.id == app.user.id) %}
+    
+    {% if canDelete %}
+        <div class="delete-form">
+            <form method="post" action="{{ path('app_stock_delete', {'id': stock.id}) }}"
+                  onsubmit="return confirm('⚠️ Are you sure you want to delete this stock record?\n\nProduct: {{ stock.product ? stock.product.name : 'Unknown' }}\nQuantity: {{ stock.quantity }}\n\nThis action cannot be undone!');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ stock.id) }}">
+                <button type="submit">🗑️ Delete Stock</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

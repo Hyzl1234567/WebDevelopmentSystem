@@ -11,8 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/order')]
+#[IsGranted('ROLE_USER')]
 final class OrderController extends AbstractController
 {
     private ActivityLogger $activityLogger;
@@ -38,19 +40,21 @@ final class OrderController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $order->setCreatedBy($this->getUser());
+            
             $entityManager->persist($order);
             $entityManager->flush();
 
-            // Log the activity - Staff creates a record
             $this->activityLogger->logCreate(
                 $this->getUser(),
                 'Order',
                 $order->getId(),
                 sprintf(
-                    '#%d - Customer: %s, Product: %s, Total: ₱%s',
+                    '#%d - Customer: %s, Product: %s, Quantity: %d, Total: ₱%s',
                     $order->getId(),
-                    $order->getCustomer(),
+                    $order->getCustomer()->getName(),
                     $order->getProduct()->getName(),
+                    $order->getQuantity(),
                     number_format($order->getTotalPrice(), 2)
                 )
             );
@@ -77,13 +81,17 @@ final class OrderController extends AbstractController
     #[Route('/{id}/edit', name: 'app_order_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Order $order, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->canEditOrDelete($order)) {
+            $this->addFlash('error', 'You do not have permission to edit this order. You can only edit your own records.');
+            return $this->redirectToRoute('app_order_index', [], Response::HTTP_SEE_OTHER);
+        }
+
         $form = $this->createForm(Order1Type::class, $order);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            // Log the activity - Staff edits a record
             $this->activityLogger->logUpdate(
                 $this->getUser(),
                 'Order',
@@ -91,7 +99,7 @@ final class OrderController extends AbstractController
                 sprintf(
                     '#%d - Customer: %s',
                     $order->getId(),
-                    $order->getCustomer()
+                    $order->getCustomer()->getName()
                 )
             );
 
@@ -109,16 +117,19 @@ final class OrderController extends AbstractController
     #[Route('/{id}', name: 'app_order_delete', methods: ['POST'])]
     public function delete(Request $request, Order $order, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->canEditOrDelete($order)) {
+            $this->addFlash('error', 'You do not have permission to delete this order. You can only delete your own records.');
+            return $this->redirectToRoute('app_order_index', [], Response::HTTP_SEE_OTHER);
+        }
+
         if ($this->isCsrfTokenValid('delete'.$order->getId(), $request->getPayload()->getString('_token'))) {
-            // Store data before deletion
             $orderId = $order->getId();
-            $customerName = $order->getCustomer();
+            $customerName = $order->getCustomer()->getName();
             $productName = $order->getProduct()->getName();
 
             $entityManager->remove($order);
             $entityManager->flush();
 
-            // Log the activity - Staff deletes a record
             $this->activityLogger->logDelete(
                 $this->getUser(),
                 'Order',
@@ -135,5 +146,24 @@ final class OrderController extends AbstractController
         }
 
         return $this->redirectToRoute('app_order_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function canEditOrDelete(Order $order): bool
+    {
+        $currentUser = $this->getUser();
+        
+        if (!$order->getCreatedBy()) {
+            return true;
+        }
+
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+            return true;
+        }
+
+        if (in_array('ROLE_STAFF', $currentUser->getRoles())) {
+            return $order->getCreatedBy() === $currentUser;
+        }
+
+        return false;
     }
 }

@@ -35,11 +35,6 @@ class ProductType extends AbstractType
                 'scale' => 2,
                 'attr' => ['placeholder' => 'Enter price'],
             ])
-            ->add('size', TextType::class, [
-                'label' => 'Size',
-                'required' => false,
-                'attr' => ['placeholder' => 'e.g. Small, Medium, Large'],
-            ])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
@@ -47,17 +42,16 @@ class ProductType extends AbstractType
                 'label' => 'Category',
             ])
             ->add('imageFile', FileType::class, [
-        'mapped' => false,   
-        'required' => true,
-        'constraints' => [
-            new File([
-                'maxSize' => '2M',
-                'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'],
-                'mimeTypesMessage' => 'Please upload a valid image file (JPG, PNG, GIF)',
-            ])
-        ],
-    ]);
-             
+                'mapped' => false,   
+                'required' => true,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'],
+                        'mimeTypesMessage' => 'Please upload a valid image file (JPG, PNG, GIF)',
+                    ])
+                ],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -5,14 +5,17 @@ namespace App\Service;
 use App\Entity\ActivityLog;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ActivityLogger
 {
     private EntityManagerInterface $entityManager;
+    private RequestStack $requestStack;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
     {
         $this->entityManager = $entityManager;
+        $this->requestStack = $requestStack;
     }
 
     public function log(?User $user, string $action, ?string $entity = null, ?int $entityId = null, ?string $description = null): void
@@ -24,6 +27,12 @@ class ActivityLogger
         $log->setEntityId($entityId);
         $log->setDescription($description);
         $log->setCreatedAt(new \DateTimeImmutable());
+
+        // Get IP address from request
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request) {
+            $log->setIpAddress($request->getClientIp());
+        }
 
         $this->entityManager->persist($log);
         $this->entityManager->flush();

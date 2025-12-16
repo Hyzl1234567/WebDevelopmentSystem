@@ -15,7 +15,7 @@ class ActivityLog
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
@@ -29,6 +29,9 @@ class ActivityLog
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
+
+    #[ORM\Column(length: 45, nullable: true)]
+    private ?string $ipAddress = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -94,6 +97,18 @@ class ActivityLog
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getIpAddress(): ?string
+    {
+        return $this->ipAddress;
+    }
+
+    public function setIpAddress(?string $ipAddress): static
+    {
+        $this->ipAddress = $ipAddress;
 
         return $this;
     }

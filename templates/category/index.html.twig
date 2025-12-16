@@ -15,9 +15,82 @@ h1 {
     text-align: center;
 }
 
+/* Flash messages */
+.alert {
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* DataTable wrapper styling */
+.dataTables_wrapper {
+    padding: 20px 0;
+}
+
+/* DataTable search box */
+.dataTables_filter input {
+    border: 2px solid #2d4d22;
+    border-radius: 6px;
+    padding: 6px 12px;
+    margin-left: 8px;
+}
+
+/* DataTable length selector */
+.dataTables_length select {
+    border: 2px solid #2d4d22;
+    border-radius: 6px;
+    padding: 4px 8px;
+    margin: 0 8px;
+}
+
+/* DataTable pagination */
+.dataTables_paginate .paginate_button {
+    padding: 6px 12px;
+    margin: 0 2px;
+    border-radius: 6px;
+    border: 1px solid #2d4d22;
+    background: white;
+    color: #2d4d22 !important;
+}
+
+.dataTables_paginate .paginate_button:hover {
+    background: #2d4d22 !important;
+    color: white !important;
+    border: 1px solid #2d4d22;
+}
+
+.dataTables_paginate .paginate_button.current {
+    background: #2d4d22 !important;
+    color: white !important;
+    border: 1px solid #2d4d22;
+}
+
+.dataTables_paginate .paginate_button.disabled {
+    color: #ccc !important;
+}
+
+/* DataTable info text */
+.dataTables_info {
+    color: #666;
+    font-size: 14px;
+}
+
 /* Table container */
 .table {
-    width: 100%;
+    width: 100% !important;
     border-collapse: collapse;
     background-color: #f9fff6;
     border-radius: 10px;
@@ -46,13 +119,13 @@ h1 {
     font-size: 15px;
 }
 
-.table tr:hover {
+.table tbody tr:hover {
     background-color: #eef7e6;
     transition: 0.2s;
 }
 
 /* Buttons */
-.table a {
+.table a, .table button {
     text-decoration: none;
     padding: 6px 12px;
     border-radius: 6px;
@@ -60,29 +133,68 @@ h1 {
     margin-right: 5px;
     font-weight: 500;
     transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
 }
 
-.table a[href*="show"] {
+.btn-show {
     background-color: #1D4A23;
     color: white;
 }
 
-.table a[href*="show"]:hover {
+.btn-show:hover {
     background-color: #2f6b35;
 }
 
-/* Edit Button */
-.table a[href*="edit"] {
-    background-color: #1D4A23;
+.btn-edit {
+    background-color: #99CC67;
+    color: #1D4A23;
+}
+
+.btn-edit:hover {
+    background-color: #b6df8a;
+}
+
+.btn-delete {
+    background-color: #6F4E37;
     color: white;
 }
 
-.table a[href*="edit"]:hover {
-    background-color: #2f6b35;
+.btn-delete:hover {
+    background-color: #8b6348;
+}
+
+.btn-locked {
+    background-color: #bdc3c7;
+    color: #7f8c8d;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Badge for Created By */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.badge-admin {
+    background-color: #9b59b6;
+}
+
+.badge-staff {
+    background-color: #3498db;
+}
+
+.badge-unknown {
+    background-color: #95a5a6;
 }
 
 /* Create New Button */
-a[href*="new"] {
+.create-new-btn {
     display: inline-block;
     background-color: #99CC67;
     color: #1D4A23;
@@ -94,55 +206,50 @@ a[href*="new"] {
     transition: background-color 0.2s ease;
 }
 
-a[href*="new"]:hover {
+.create-new-btn:hover {
     background-color: #b6df8a;
 }
 
 /* Empty table message */
-.table td[colspan="4"] {
+.table td[colspan] {
     text-align: center;
     color: #666;
     font-style: italic;
 }
 
-.btn-show {
-    background-color: #1D4A23;
-    color: white;
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    margin-right: 5px;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
+/* Center no records message */
+td.dataTables_empty {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    padding: 30px !important;
 }
 
-
-
-.btn-edit {
-    
-    color: white;
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    margin-right: 5px;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
+.delete-form {
+    display: inline;
+    margin: 0;
 }
-
-
-
 </style>
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success">{{ message }}</div>
+{% endfor %}
+
+{% for message in app.flashes('error') %}
+    <div class="alert alert-error">{{ message }}</div>
+{% endfor %}
 
 <h1>☘️ Category List ☘️</h1>
 
-<table class="table">
+<table id="categoriesTable" class="table">
     <thead>
         <tr>
             <th>Id</th>
             <th>Name</th>
             <th>Description</th>
+            <th>Products Count</th>
+            <th>Created At</th>
+            <th>Created By</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -152,18 +259,78 @@ a[href*="new"]:hover {
             <td>{{ category.id }}</td>
             <td>{{ category.name }}</td>
             <td>{{ category.description }}</td>
+            <td><strong>{{ category.products|length }}</strong></td>
+            <td>{{ category.createdAt ? category.createdAt|date('Y-m-d H:i') : '—' }}</td>
             <td>
-                <a href="{{ path('app_category_show', {'id': category.id}) }}">Show</a>
-                <a href="{{ path('app_category_edit', {'id': category.id}) }}">Edit</a>
+                {% if category.createdBy %}
+                    <span class="badge {{ 'ROLE_ADMIN' in category.createdBy.roles ? 'badge-admin' : 'badge-staff' }}">
+                        {{ 'ROLE_ADMIN' in category.createdBy.roles ? '👑 ' : '👤 ' }}{{ category.createdBy.username }}
+                    </span>
+                {% else %}
+                    <span class="badge badge-unknown">Unknown</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ path('app_category_show', {'id': category.id}) }}" class="btn-show">👁️ Show</a>
+                
+                {% set canEdit = is_granted('ROLE_ADMIN') or (category.createdBy and category.createdBy.id == app.user.id) %}
+                
+                {% if canEdit %}
+                    <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="btn-edit">✏️ Edit</a>
+                    <form method="post" action="{{ path('app_category_delete', {'id': category.id}) }}" class="delete-form" 
+                          onsubmit="return confirm('⚠️ Are you sure you want to delete this category?\n\nCategory: {{ category.name }}\n\nThis action cannot be undone!');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+                        <button type="submit" class="btn-delete">🗑️ Delete</button>
+                    </form>
+                {% else %}
+                    <span class="btn-locked" title="You can only edit your own records">🔒 Locked</span>
+                {% endif %}
             </td>
         </tr>
     {% else %}
         <tr>
-            <td colspan="4">No records found 🌿</td>
+            <td colspan="7">No records found 🌿</td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
 
-<a href="{{ path('app_category_new') }}">➕ Create new</a>
+<a href="{{ path('app_category_new') }}" class="create-new-btn">➕ Create new</a>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+$(document).ready(function() {
+    $('#categoriesTable').DataTable({
+        "order": [[0, "desc"]], // Sort by ID descending (newest first)
+        "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        "language": {
+            "search": "🔍 Search:",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ categories",
+            "infoEmpty": "No categories available",
+            "infoFiltered": "(filtered from _MAX_ total categories)",
+            "zeroRecords": "No matching categories found",
+            "emptyTable": "No categories available in table 🌿",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        },
+        "columnDefs": [
+            { 
+                "orderable": false, 
+                "targets": [6] // Disable sorting on Actions column
+            },
+            {
+                "type": "num",
+                "targets": [3] // Products Count column - for proper numeric sorting
+            }
+        ]
+    });
+});
+</script>
 {% endblock %}

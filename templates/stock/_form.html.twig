@@ -1,9 +1,16 @@
-
  <style>
     .form-container form {
         display: flex;
         flex-direction: column;
         gap: 16px;
+    }
+
+    .form-container label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        color: #1f4e25;
+        font-size: 14px;
     }
 
     .form-container input,
@@ -24,6 +31,13 @@
         border-color: #2d572c;
         box-shadow: 0 0 6px rgba(45, 87, 44, 0.3);
         outline: none;
+    }
+
+    /* Read-only field styling */
+    .readonly-field {
+        background-color: #f4f4f4;
+        color: #666;
+        cursor: not-allowed;
     }
 
     /* Button Row */
@@ -51,16 +65,44 @@
     .form-container .back-link:hover {
         background-color: #2e6b2e;
     }
+
+    /* Form row styling */
+    .form-row {
+        margin-bottom: 15px;
+    }
+
+    /* Error messages */
+    .form-error {
+        color: #c9302c;
+        font-size: 13px;
+        margin-top: 5px;
+    }
 </style>
 
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-
-    <div class="form-actions">
-        <a href="{{ path('app_stock_index') }}" class="back-link">Back to list</a>
-        
-        <button class="btn">{{ button_label|default('Save') }}</button>
+    
+    <div class="form-row">
+        {{ form_label(form.product) }}
+        {{ form_widget(form.product) }}
+        {{ form_errors(form.product) }}
     </div>
 
-    
+    <div class="form-row">
+        {{ form_label(form.quantity) }}
+        {{ form_widget(form.quantity) }}
+        {{ form_errors(form.quantity) }}
+    </div>
+
+    <div class="form-row">
+        {{ form_label(form.lastUpdated) }}
+        {{ form_widget(form.lastUpdated) }}
+        {{ form_errors(form.lastUpdated) }}
+        <small style="color: #666; font-size: 12px;">This field is automatically set</small>
+    </div>
+
+    <div class="form-actions">
+        <a href="{{ path('app_stock_index') }}" class="back-link">⬅ Back to list</a>
+        <button class="btn">{{ button_label|default('💾 Save') }}</button>
+    </div>
+
 {{ form_end(form) }}

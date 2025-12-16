@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Repository\ActivityLogRepository;
@@ -16,20 +17,24 @@ class DashboardController extends AbstractController
         ActivityLogRepository $activityLogRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        // Get all users first
-        $users = $userRepository->findAll();
-        $totalUsers = count($users);
+        // Get statistics
+        $totalUsers = $userRepository->count([]);
         
-        // Count users by role - FIXED
-        $totalAdmins = count(array_filter($users, function($user) {
-            return in_array('ROLE_ADMIN', $user->getRoles());
-        }));
+        // Count admins and staff
+        $allUsers = $userRepository->findAll();
+        $totalAdmins = 0;
+        $totalStaff = 0;
         
-        $totalStaff = count(array_filter($users, function($user) {
-            return in_array('ROLE_STAFF', $user->getRoles());
-        }));
+        foreach ($allUsers as $user) {
+            if (in_array('ROLE_ADMIN', $user->getRoles())) {
+                $totalAdmins++;
+            }
+            if (in_array('ROLE_STAFF', $user->getRoles())) {
+                $totalStaff++;
+            }
+        }
         
-        // Count products (adjust table name if needed)
+        // Count products
         $totalProducts = 0;
         try {
             $connection = $entityManager->getConnection();
@@ -59,9 +64,6 @@ class DashboardController extends AbstractController
             $totalStocks = 0;
         }
 
-        // Calculate total records - NEW
-        $totalRecords = $totalProducts + $totalCategories + $totalStocks;
-
         // Get recent activities
         $recentActivities = $activityLogRepository->findRecentActivities(10);
 
@@ -84,7 +86,6 @@ class DashboardController extends AbstractController
             'totalProducts' => $totalProducts,
             'totalCategories' => $totalCategories,
             'totalStocks' => $totalStocks,
-            'totalRecords' => $totalRecords, // NEW
             'recentActivities' => $recentActivities,
         ]);
     }

@@ -39,6 +39,14 @@ class Product
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    // Track who created this product
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $createdBy = null;
+
     /**
      * @var Collection<int, Stock>
      */
@@ -62,6 +70,7 @@ class Product
         $this->stocks = new ArrayCollection();
         $this->sales = new ArrayCollection();
         $this->orders = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     // ========== Basic Fields ==========
@@ -148,6 +157,28 @@ class Product
         return $this;
     }
 
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
     // ========== Stocks ==========
 
     /** @return Collection<int, Stock> */
@@ -202,12 +233,7 @@ class Product
         return $this;
     }
 
-    // ========== Utility ==========
-
-    public function __toString(): string
-    {
-        return $this->name ?? '';
-    }
+    // ========== Orders ==========
 
     /**
      * @return Collection<int, Order>
@@ -237,5 +263,12 @@ class Product
         }
 
         return $this;
+    }
+
+    // ========== Utility ==========
+
+    public function __toString(): string
+    {
+        return $this->name ?? '';
     }
 }

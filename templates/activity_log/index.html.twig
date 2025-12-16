@@ -1,0 +1,404 @@
+ {% extends 'dashboard/layout.html.twig' %}
+
+{% block title %}System Activity Logs{% endblock %}
+
+{% block body %}
+<style>
+    .logs-container {
+        max-width: 1600px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .logs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #1D4A23;
+    }
+
+    .logs-header h1 {
+        color: #1D4A23;
+        margin: 0;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .filter-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .filter-section h3 {
+        color: #1D4A23;
+        margin: 0 0 15px 0;
+        font-size: 18px;
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .filter-group select,
+    .filter-group input {
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+        outline: none;
+        border-color: #1D4A23;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background-color: #1D4A23;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2d6b34;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .btn-export {
+        background-color: #99CC67;
+        color: #1D4A23;
+    }
+
+    .btn-export:hover {
+        background-color: #b6df8a;
+    }
+
+    table {
+        width: 100%;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-collapse: collapse;
+    }
+
+    thead {
+        background-color: #1D4A23;
+        color: white;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        font-size: 14px;
+        border-bottom: 1px solid #eee;
+    }
+
+    tbody tr:hover {
+        background-color: #f4f9ef;
+        cursor: pointer;
+    }
+
+    .action-badge {
+        padding: 5px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .action-create {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .action-update {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .action-delete {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .action-login {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+
+    .action-logout {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+
+    .no-logs {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1D4A23;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .role-badge {
+        font-size: 11px;
+        background: #e8f5e9;
+        padding: 3px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        margin: 2px;
+        color: #1D4A23;
+        font-weight: 600;
+    }
+
+    .entity-badge {
+        background: #ecf0f1;
+        color: #2c3e50;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="logs-container">
+    <div class="logs-header">
+        <h1>📋 System Activity Logs</h1>
+        <div style="display: flex; gap: 10px;">
+           <!-- <a href="{{ path('app_activity_log_export', current_filters) }}" class="btn btn-export">📥 Export CSV</a>-->
+            <a href="{{ path('app_dashboard') }}" class="btn btn-secondary">← Back</a>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number">{{ logs|length }}</div>
+            <div class="stat-label">Total Results</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ logs|filter(l => l.action == 'create')|length }}</div>
+            <div class="stat-label">Created</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ logs|filter(l => l.action == 'update')|length }}</div>
+            <div class="stat-label">Updated</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ logs|filter(l => l.action == 'delete')|length }}</div>
+            <div class="stat-label">Deleted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ logs|filter(l => l.action == 'login')|length }}</div>
+            <div class="stat-label">Logins</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section">
+        <h3>🔍 Filter Logs</h3>
+        <form method="get" class="filter-form">
+            <div class="filter-group">
+                <label for="user">User</label>
+                <select name="user" id="user">
+                    <option value="">All Users</option>
+                    {% for u in users %}
+                        <option value="{{ u.id }}" {% if current_filters.user and current_filters.user == u.id %}selected{% endif %}>
+                            {{ u.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="action">Action</label>
+                <select name="action" id="action">
+                    <option value="">All Actions</option>
+                    {% for act in actions %}
+                        <option value="{{ act.action }}" {% if current_filters.action == act.action %}selected{% endif %}>
+                            {{ act.action|capitalize }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="entity">Entity</label>
+                <select name="entity" id="entity">
+                    <option value="">All Entities</option>
+                    {% for ent in entities %}
+                        <option value="{{ ent.entity }}" {% if current_filters.entity == ent.entity %}selected{% endif %}>
+                            {{ ent.entity }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="start_date">Start Date</label>
+                <input type="date" name="start_date" id="start_date" value="{{ current_filters.start_date }}">
+            </div>
+
+            <div class="filter-group">
+                <label for="end_date">End Date</label>
+                <input type="date" name="end_date" id="end_date" value="{{ current_filters.end_date }}">
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">🔍 Apply Filters</button>
+                <a href="{{ path('app_activity_log_index') }}" class="btn btn-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Logs Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Description</th>
+                <th>IP Address</th>
+                <th>Timestamp</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if logs|length > 0 %}
+                {% for log in logs %}
+                    <tr onclick="window.location.href='{{ path('app_activity_log_show', {id: log.id}) }}'">
+                        <td>#{{ log.id }}</td>
+                        <td>
+                            {% if log.user %}
+                                <strong>#{{ log.user.id }}</strong>
+                            {% else %}
+                                <em>—</em>
+                            {% endif %}
+                        </td>
+                        <td>{{ log.user ? log.user.username : 'System' }}</td>
+                        <td>
+                            {% if log.user %}
+                                {% for role in log.user.roles %}
+                                    {% if role != 'ROLE_USER' %}
+                                        <span class="role-badge">
+                                            {{ role|replace({'ROLE_': ''}) }}
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="action-badge action-{{ log.action }}">
+                                {{ log.action }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if log.entity %}
+                                <span class="entity-badge">{{ log.entity }}</span>
+                                {% if log.entityId %}<small>#{{ log.entityId }}</small>{% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>{{ log.description|slice(0, 60) }}{% if log.description|length > 60 %}...{% endif %}</td>
+                        <td>{{ log.ipAddress ?? '—' }}</td>
+                        <td>{{ log.createdAt|date('M d, Y H:i:s') }}</td>
+                        <td>
+                            <a href="{{ path('app_activity_log_show', {id: log.id}) }}" class="btn btn-primary btn-sm" onclick="event.stopPropagation();">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="10" class="no-logs">
+                        <p>No activity logs found matching your filters.</p>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
