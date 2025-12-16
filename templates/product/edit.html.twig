@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+ {% extends 'base.html.twig' %}
 
 {% block title %}Edit Product{% endblock %}
 
@@ -173,7 +173,7 @@
     <div class="form-actions">
         <a href="{{ path('app_product_index') }}" class="btn">← Back</a>
         
-        {% set canDelete = is_granted('ROLE_ADMIN') or (product.createdBy and product.createdBy.id == app.user.id) %}
+        {% set canDelete = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
         
         {% if canDelete %}
             <form method="post" action="{{ path('app_product_delete', {'id': product.id}) }}" class="delete-form"

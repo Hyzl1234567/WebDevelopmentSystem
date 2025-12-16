@@ -44,6 +44,10 @@ class Order1Type extends AbstractType
                 'choice_label' => function(Product $product) {
                     return $product->getName() . ' - ₱' . number_format($product->getPrice(), 2);
                 },
+                // Add price metadata to each option so JS can compute totals client-side
+                'choice_attr' => function(Product $product) {
+                    return ['data-price' => $product->getPrice()];
+                },
                 'label' => 'Product',
                 'placeholder' => 'Select a product',
                 'attr' => ['class' => 'form-control'],

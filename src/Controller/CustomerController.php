@@ -79,8 +79,9 @@ final class CustomerController extends AbstractController
     #[Route('/{id}/edit', name: 'app_customer_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Customer $customer, EntityManagerInterface $entityManager): Response
     {
+        // Both ADMIN and STAFF have full access to edit any customer
         if (!$this->canEditOrDelete($customer)) {
-            $this->addFlash('error', 'You do not have permission to edit this customer. You can only edit your own records.');
+            $this->addFlash('error', 'You do not have permission to edit this customer. You need staff or admin privileges.');
             return $this->redirectToRoute('app_customer_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -111,8 +112,9 @@ final class CustomerController extends AbstractController
     #[Route('/{id}', name: 'app_customer_delete', methods: ['POST'])]
     public function delete(Request $request, Customer $customer, EntityManagerInterface $entityManager): Response
     {
+        // Both ADMIN and STAFF have full access to delete any customer
         if (!$this->canEditOrDelete($customer)) {
-            $this->addFlash('error', 'You do not have permission to delete this customer. You can only delete your own records.');
+            $this->addFlash('error', 'You do not have permission to delete this customer. You need staff or admin privileges.');
             return $this->redirectToRoute('app_customer_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -146,22 +148,21 @@ final class CustomerController extends AbstractController
         return $this->redirectToRoute('app_customer_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    /**
+     * Check if current user can edit or delete a customer
+     * Both ADMIN and STAFF have full access to all customers
+     */
     private function canEditOrDelete(Customer $customer): bool
     {
         $currentUser = $this->getUser();
         
-        if (!$customer->getCreatedBy()) {
+        // Allow if user is ADMIN or STAFF
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles()) || 
+            in_array('ROLE_STAFF', $currentUser->getRoles())) {
             return true;
         }
 
-        if (in_array('ROLE_ADMIN', $currentUser->getRoles())) {
-            return true;
-        }
-
-        if (in_array('ROLE_STAFF', $currentUser->getRoles())) {
-            return $customer->getCreatedBy() === $currentUser;
-        }
-
+        // Regular users cannot edit/delete
         return false;
     }
 }

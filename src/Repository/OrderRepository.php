@@ -40,4 +40,22 @@ class OrderRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Fetch all orders with their related customer and product using LEFT JOINs.
+     * This prevents Doctrine from trying to proxy/load missing related entities during template rendering.
+     *
+     * @return Order[]
+     */
+    public function findAllWithRelations(): array
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.customer', 'c')
+            ->addSelect('c')
+            ->leftJoin('o.product', 'p')
+            ->addSelect('p')
+            ->orderBy('o.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

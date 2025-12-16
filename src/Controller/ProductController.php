@@ -226,8 +226,7 @@ final class ProductController extends AbstractController
 
     /**
      * Check if the current user can edit or delete the product
-     * - Admin can edit/delete all records
-     * - Staff can only edit/delete their own records
+     * - Admin and Staff have full access to all records
      */
     private function canEditOrDelete(Product $product): bool
     {
@@ -238,14 +237,9 @@ final class ProductController extends AbstractController
             return true;
         }
 
-        // Admin can edit/delete everything
-        if (in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+        // Both ADMIN and STAFF have full access
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles()) || in_array('ROLE_STAFF', $currentUser->getRoles())) {
             return true;
-        }
-
-        // Staff can only edit/delete their own records
-        if (in_array('ROLE_STAFF', $currentUser->getRoles())) {
-            return $product->getCreatedBy() === $currentUser;
         }
 
         return false;

@@ -327,12 +327,30 @@
                     {% for order in orders %}
                         <tr>
                             <td>{{ order.id }}</td>
-                            <td>{{ order.customer }}</td>
-                            <td>{{ order.product.name ?? 'N/A' }}</td>
+                            <td>
+                                {% if order.customer %}
+                                    {{ order.customer.name }}
+                                {% else %}
+                                    <span class="badge bg-secondary" title="Customer deleted">Deleted Customer</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if order.product %}
+                                    {{ order.product.name }}
+                                {% else %}
+                                    <span class="badge bg-secondary" title="Product deleted">Deleted Product</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 <span class="quantity-badge">{{ order.quantity ?? 1 }}</span>
                             </td>
-                            <td>₱{{ order.product ? order.product.price|number_format(2, '.', ',') : '0.00' }}</td>
+                            <td>
+                                {% if order.product and order.product.price is not null %}
+                                    ₱{{ order.product.price|number_format(2, '.', ',') }}
+                                {% else %}
+                                    ₱0.00
+                                {% endif %}
+                            </td>
                             <td><strong>₱{{ order.totalPrice|number_format(2, '.', ',') }}</strong></td>
                             <td>
                                 {% if order.status == 'Pending' %}
@@ -360,11 +378,11 @@
                             <td class="actions-cell">
                                 <a href="{{ path('app_order_show', {'id': order.id}) }}" class="btn btn-sm btn-info" title="View">👁️ View</a>
                                 
-                                {% set canEdit = is_granted('ROLE_ADMIN') or (order.createdBy and order.createdBy.id == app.user.id) %}
+                                {% set canEdit = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
                                 
                                 {% if canEdit %}
                                     <a href="{{ path('app_order_edit', {'id': order.id}) }}" class="btn btn-sm btn-warning" title="Edit">✏️ Edit</a>
-                                    <form method="post" action="{{ path('app_order_delete', {'id': order.id}) }}" class="delete-form" onsubmit="return confirm('⚠️ Are you sure you want to delete this order?\n\nOrder #{{ order.id }}\nCustomer: {{ order.customer }}\n\nThis action cannot be undone!');">
+                                    <form method="post" action="{{ path('app_order_delete', {'id': order.id}) }}" class="delete-form" onsubmit="return confirm('⚠️ Are you sure you want to delete this order?\n\nOrder #{{ order.id }}\n\nThis action cannot be undone!');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ order.id) }}">
                                         <button type="submit" class="btn btn-sm btn-danger" title="Delete">🗑️ Delete</button>
                                     </form>

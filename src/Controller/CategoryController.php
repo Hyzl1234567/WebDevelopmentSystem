@@ -75,9 +75,9 @@ final class CategoryController extends AbstractController
     #[Route('/{id}/edit', name: 'app_category_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Category $category, EntityManagerInterface $entityManager): Response
     {
-        // Check if user can edit this category
+        // Both ADMIN and STAFF have full access to edit any category
         if (!$this->canEditOrDelete($category)) {
-            $this->addFlash('error', 'You do not have permission to edit this category. You can only edit your own records.');
+            $this->addFlash('error', 'You do not have permission to edit this category. You need staff or admin privileges.');
             return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -108,9 +108,9 @@ final class CategoryController extends AbstractController
     #[Route('/{id}', name: 'app_category_delete', methods: ['POST'])]
     public function delete(Request $request, Category $category, EntityManagerInterface $entityManager): Response
     {
-        // Check if user can delete this category
+        // Both ADMIN and STAFF have full access to delete any category
         if (!$this->canEditOrDelete($category)) {
-            $this->addFlash('error', 'You do not have permission to delete this category. You can only delete your own records.');
+            $this->addFlash('error', 'You do not have permission to delete this category. You need staff or admin privileges.');
             return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -136,29 +136,20 @@ final class CategoryController extends AbstractController
     }
 
     /**
-     * Check if the current user can edit or delete the category
-     * - Admin can edit/delete all records
-     * - Staff can only edit/delete their own records
+     * Check if current user can edit or delete a category
+     * Both ADMIN and STAFF have full access to all categories
      */
     private function canEditOrDelete(Category $category): bool
     {
         $currentUser = $this->getUser();
         
-        // If no creator is set, allow access (for legacy records)
-        if (!$category->getCreatedBy()) {
+        // Allow if user is ADMIN or STAFF
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles()) || 
+            in_array('ROLE_STAFF', $currentUser->getRoles())) {
             return true;
         }
 
-        // Admin can edit/delete everything
-        if (in_array('ROLE_ADMIN', $currentUser->getRoles())) {
-            return true;
-        }
-
-        // Staff can only edit/delete their own records
-        if (in_array('ROLE_STAFF', $currentUser->getRoles())) {
-            return $category->getCreatedBy() === $currentUser;
-        }
-
+        // Regular users cannot edit/delete
         return false;
     }
 }

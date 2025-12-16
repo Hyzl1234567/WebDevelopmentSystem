@@ -174,8 +174,8 @@
         </div>
     {{ form_end(form) }}
 
-    {# DELETE FORM (SEPARATE) - Only show if user has permission #}
-    {% set canDelete = is_granted('ROLE_ADMIN') or (category.createdBy and category.createdBy.id == app.user.id) %}
+    {# DELETE FORM (SEPARATE) - Both ADMIN and STAFF have full access #}
+    {% set canDelete = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
     
     {% if canDelete %}
         <div class="button-group" style="margin-top: 20px;">

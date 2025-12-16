@@ -198,7 +198,7 @@
         </div>
     {{ form_end(form) }}
 
-    {% set canDelete = is_granted('ROLE_ADMIN') or (stock.createdBy and stock.createdBy.id == app.user.id) %}
+    {% set canDelete = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
     
     {% if canDelete %}
         <div class="delete-form">

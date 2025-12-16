@@ -290,7 +290,7 @@
                 <td>
                     <a href="{{ path('app_stock_show', {'id': stock.id}) }}" class="btn-action btn-show">👁️ show</a>
                     
-                    {% set canEdit = is_granted('ROLE_ADMIN') or (stock.createdBy and stock.createdBy.id == app.user.id) %}
+                    {% set canEdit = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
                     
                     {% if canEdit %}
                         <a href="{{ path('app_stock_edit', {'id': stock.id}) }}" class="btn-action btn-edit">✏️ edit</a>

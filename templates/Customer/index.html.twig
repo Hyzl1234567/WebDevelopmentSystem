@@ -1,4 +1,4 @@
-{% extends 'dashboard/layout.html.twig' %}
+ {% extends 'dashboard/layout.html.twig' %}
 
 {% block title %}Customers{% endblock %}
 
@@ -102,6 +102,59 @@
         cursor: not-allowed;
     }
 
+    /* DataTable wrapper styling */
+    .dataTables_wrapper {
+        padding: 20px 0;
+    }
+
+    /* DataTable search box */
+    .dataTables_filter input {
+        border: 2px solid #1D4A23;
+        border-radius: 6px;
+        padding: 6px 12px;
+        margin-left: 8px;
+    }
+
+    /* DataTable length selector */
+    .dataTables_length select {
+        border: 2px solid #1D4A23;
+        border-radius: 6px;
+        padding: 4px 8px;
+        margin: 0 8px;
+    }
+
+    /* DataTable pagination */
+    .dataTables_paginate .paginate_button {
+        padding: 6px 12px;
+        margin: 0 2px;
+        border-radius: 6px;
+        border: 1px solid #1D4A23;
+        background: white;
+        color: #1D4A23 !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
+        background: #1D4A23 !important;
+        color: white !important;
+        border: 1px solid #1D4A23;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: #1D4A23 !important;
+        color: white !important;
+        border: 1px solid #1D4A23;
+    }
+
+    .dataTables_paginate .paginate_button.disabled {
+        color: #ccc !important;
+    }
+
+    /* DataTable info text */
+    .dataTables_info {
+        color: #666;
+        font-size: 14px;
+    }
+
     table {
         width: 100% !important;
         border-collapse: collapse;
@@ -143,6 +196,10 @@
         background-color: #3498db;
     }
 
+    .actions-cell {
+        white-space: nowrap;
+    }
+
     .delete-form {
         display: inline;
     }
@@ -174,6 +231,34 @@
         border-radius: 6px;
         font-weight: 600;
         font-size: 13px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .bg-secondary {
+        background-color: #bdc3c7;
+        color: white;
+    }
+
+    /* Center no records message */
+    td.dataTables_empty {
+        text-align: center;
+        color: #777;
+        font-style: italic;
+        padding: 30px !important;
+    }
+
+    .no-customers {
+        text-align: center;
+        color: #555;
+        padding: 40px 20px;
+        font-size: 15px;
     }
 </style>
 
@@ -228,13 +313,14 @@
                                         {{ 'ROLE_ADMIN' in customer.createdBy.roles ? '👑' : '👤' }} {{ customer.createdBy.username }}
                                     </span>
                                 {% else %}
-                                    <span style="color: #999;">Unknown</span>
+                                    <span class="badge bg-secondary">Unknown</span>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="actions-cell">
                                 <a href="{{ path('app_customer_show', {'id': customer.id}) }}" class="btn btn-sm btn-info" title="View">👁️ View</a>
                                 
-                                {% set canEdit = is_granted('ROLE_ADMIN') or (customer.createdBy and customer.createdBy.id == app.user.id) %}
+                                {# Give full access to both ADMIN and STAFF #}
+                                {% set canEdit = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
                                 
                                 {% if canEdit %}
                                     <a href="{{ path('app_customer_edit', {'id': customer.id}) }}" class="btn btn-sm btn-warning" title="Edit">✏️ Edit</a>
@@ -247,21 +333,31 @@
                                                 title="Delete">🗑️ Delete</button>
                                     </form>
                                 {% else %}
-                                    <span class="btn btn-sm btn-locked" title="You can only edit/delete your own records">🔒 Locked</span>
+                                    <span class="btn btn-sm btn-locked" title="You need staff or admin privileges">🔒 Locked</span>
                                 {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="no-customers">
+                            <p>No customers found.</p>
+                            <a href="{{ path('app_customer_new') }}" class="btn btn-primary" style="margin-top: 15px;">Add Your First Customer</a>
+                        </td>
+                    </tr>
                 {% endif %}
             </tbody>
         </table>
     </div>
 </div>
+{% endblock %}
 
+{% block javascripts %}
 <script>
 $(document).ready(function() {
+    // Initialize DataTable
     $('#customersTable').DataTable({
-        "order": [[0, "desc"]],
+        "order": [[0, "desc"]], // Sort by Customer ID descending (newest first)
         "pageLength": 10,
         "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         "language": {
@@ -269,16 +365,30 @@ $(document).ready(function() {
             "lengthMenu": "Show _MENU_ entries",
             "info": "Showing _START_ to _END_ of _TOTAL_ customers",
             "infoEmpty": "No customers available",
-            "emptyTable": "No customers found. Create your first customer!",
-            "zeroRecords": "No matching customers found"
+            "infoFiltered": "(filtered from _MAX_ total customers)",
+            "zeroRecords": "No matching customers found",
+            "emptyTable": "No customers found. Add your first customer!",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [7] }
+            { 
+                "orderable": false, 
+                "targets": [7] // Disable sorting on Actions column
+            },
+            {
+                "type": "num",
+                "targets": [0, 4] // ID and Orders columns - for proper numeric sorting
+            }
         ]
     });
 
-    // Delete confirmation
-    $('.deleteBtn').on('click', function() {
+    // Delete confirmation with order count validation
+    $(document).on('click', '.deleteBtn', function() {
         const customerId = $(this).data('id');
         const customerName = $(this).data('name');
         const ordersCount = $(this).data('orders');

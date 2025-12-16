@@ -219,8 +219,7 @@ class StockController extends AbstractController
 
     /**
      * Check if the current user can edit or delete the stock record
-     * - Admin can edit/delete all records
-     * - Staff can only edit/delete their own records
+     * - Admin and Staff have full access to all records
      */
     private function canEditOrDelete(Stock $stock): bool
     {
@@ -231,14 +230,9 @@ class StockController extends AbstractController
             return true;
         }
 
-        // Admin can edit/delete everything
-        if (in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+        // Both ADMIN and STAFF have full access
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles()) || in_array('ROLE_STAFF', $currentUser->getRoles())) {
             return true;
-        }
-
-        // Staff can only edit/delete their own records
-        if (in_array('ROLE_STAFF', $currentUser->getRoles())) {
-            return $stock->getCreatedBy() === $currentUser;
         }
 
         return false;

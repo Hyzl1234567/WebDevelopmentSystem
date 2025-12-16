@@ -180,7 +180,8 @@
     <div class="button-group">
         <a href="{{ path('app_category_index') }}" class="back-btn">← Back to List</a>
         
-        {% set canEdit = is_granted('ROLE_ADMIN') or (category.createdBy and category.createdBy.id == app.user.id) %}
+        {# Both ADMIN and STAFF have full access #}
+        {% set canEdit = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
         
         {% if canEdit %}
             <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="edit-btn">✏️ Edit</a>
@@ -194,12 +195,7 @@
 
     {% if not canEdit %}
         <div class="warning-message">
-            🔒 You can only edit or delete your own records. This category was created by 
-            {% if category.createdBy %}
-                <strong>{{ category.createdBy.username }}</strong>
-            {% else %}
-                <strong>another user</strong>
-            {% endif %}.
+            🔒 You need staff or admin privileges to edit or delete categories.
         </div>
     {% endif %}
 </div>

@@ -1,4 +1,4 @@
-{% extends 'dashboard/layout.html.twig' %}
+ {% extends 'dashboard/layout.html.twig' %}
 
 {% block title %}Edit Customer{% endblock %}
 
@@ -254,7 +254,8 @@
     <div class="form-actions" style="margin-top: 20px; border-top: 2px dashed #e0e0e0; padding-top: 20px;">
         <a href="{{ path('app_customer_show', {'id': customer.id}) }}" class="btn btn-secondary">← Back to Details</a>
         
-        {% set canDelete = is_granted('ROLE_ADMIN') or (customer.createdBy and customer.createdBy.id == app.user.id) %}
+        {# Both ADMIN and STAFF have full access #}
+        {% set canDelete = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
         
         {% if canDelete %}
             <form method="post" action="{{ path('app_customer_delete', {'id': customer.id}) }}" class="delete-form" id="deleteCustomerForm">

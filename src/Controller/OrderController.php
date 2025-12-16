@@ -27,8 +27,10 @@ final class OrderController extends AbstractController
     #[Route(name: 'app_order_index', methods: ['GET'])]
     public function index(OrderRepository $orderRepository): Response
     {
+        // Use an eager-loading repository method to avoid Doctrine trying to lazy-load
+        // related entities that may have been deleted (which causes EntityNotFound exceptions).
         return $this->render('order/index.html.twig', [
-            'orders' => $orderRepository->findAll(),
+            'orders' => $orderRepository->findAllWithRelations(),
         ]);
     }
 
@@ -52,8 +54,8 @@ final class OrderController extends AbstractController
                 sprintf(
                     '#%d - Customer: %s, Product: %s, Quantity: %d, Total: ₱%s',
                     $order->getId(),
-                    $order->getCustomer()->getName(),
-                    $order->getProduct()->getName(),
+                    $order->getCustomer() ? $order->getCustomer()->getName() : 'Deleted Customer',
+                    $order->getProduct() ? $order->getProduct()->getName() : 'Deleted Product',
                     $order->getQuantity(),
                     number_format($order->getTotalPrice(), 2)
                 )
@@ -99,7 +101,7 @@ final class OrderController extends AbstractController
                 sprintf(
                     '#%d - Customer: %s',
                     $order->getId(),
-                    $order->getCustomer()->getName()
+                    $order->getCustomer() ? $order->getCustomer()->getName() : 'Deleted Customer'
                 )
             );
 
@@ -124,8 +126,8 @@ final class OrderController extends AbstractController
 
         if ($this->isCsrfTokenValid('delete'.$order->getId(), $request->getPayload()->getString('_token'))) {
             $orderId = $order->getId();
-            $customerName = $order->getCustomer()->getName();
-            $productName = $order->getProduct()->getName();
+            $customerName = $order->getCustomer() ? $order->getCustomer()->getName() : 'Deleted Customer';
+            $productName = $order->getProduct() ? $order->getProduct()->getName() : 'Deleted Product';
 
             $entityManager->remove($order);
             $entityManager->flush();
@@ -156,12 +158,9 @@ final class OrderController extends AbstractController
             return true;
         }
 
-        if (in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+        // Both ADMIN and STAFF have full access
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles()) || in_array('ROLE_STAFF', $currentUser->getRoles())) {
             return true;
-        }
-
-        if (in_array('ROLE_STAFF', $currentUser->getRoles())) {
-            return $order->getCreatedBy() === $currentUser;
         }
 
         return false;

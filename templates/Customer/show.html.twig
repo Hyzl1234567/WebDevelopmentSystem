@@ -1,4 +1,4 @@
-{% extends 'dashboard/layout.html.twig' %}
+ {% extends 'dashboard/layout.html.twig' %}
 
 {% block title %}Customer Details{% endblock %}
 
@@ -253,7 +253,8 @@
     <div class="customer-actions">
         <a href="{{ path('app_customer_index') }}" class="btn btn-secondary">← Back to Customers</a>
         
-        {% set canEdit = is_granted('ROLE_ADMIN') or (customer.createdBy and customer.createdBy.id == app.user.id) %}
+        {# Both ADMIN and STAFF have full access #}
+        {% set canEdit = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
         
         {% if canEdit %}
             <a href="{{ path('app_customer_edit', {'id': customer.id}) }}" class="btn btn-warning">✏️ Edit Customer</a>
@@ -266,12 +267,7 @@
 
     {% if not canEdit %}
         <div class="alert alert-warning">
-            🔒 <strong>Permission Notice:</strong> You can only edit or delete your own records. This customer was created by 
-            {% if customer.createdBy %}
-                <strong>{{ customer.createdBy.username }}</strong>
-            {% else %}
-                <strong>another user</strong>
-            {% endif %}.
+            🔒 <strong>Permission Notice:</strong> You need staff or admin privileges to edit or delete customers.
         </div>
     {% endif %}
 </div>

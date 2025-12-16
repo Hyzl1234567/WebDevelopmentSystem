@@ -273,7 +273,8 @@ td.dataTables_empty {
             <td>
                 <a href="{{ path('app_category_show', {'id': category.id}) }}" class="btn-show">👁️ Show</a>
                 
-                {% set canEdit = is_granted('ROLE_ADMIN') or (category.createdBy and category.createdBy.id == app.user.id) %}
+                {# Both ADMIN and STAFF have full access #}
+                {% set canEdit = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
                 
                 {% if canEdit %}
                     <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="btn-edit">✏️ Edit</a>
@@ -283,7 +284,7 @@ td.dataTables_empty {
                         <button type="submit" class="btn-delete">🗑️ Delete</button>
                     </form>
                 {% else %}
-                    <span class="btn-locked" title="You can only edit your own records">🔒 Locked</span>
+                    <span class="btn-locked" title="You need staff or admin privileges">🔒 Locked</span>
                 {% endif %}
             </td>
         </tr>

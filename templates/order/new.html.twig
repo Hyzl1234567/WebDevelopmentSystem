@@ -171,9 +171,8 @@
         </div>
 
         <div class="form-group">
-            {{ form_label(form.quantity, 'Quantity', {'label_attr': {'class': 'required'}}) }}
-            {{ form_widget(form.quantity, {'attr': {'class': 'form-control', 'placeholder': '1', 'min': '1'}}) }}
-            {{ form_errors(form.quantity) }}
+            <label class="required">Total Price (₱)</label>
+            <input type="text" id="order_totalPrice_display" class="form-control" placeholder="0.00" readonly value="{{ order.totalPrice ? order.totalPrice|number_format(2, '.', ',') : '0.00' }}">
         </div>
 
         <div class="form-group">
@@ -190,4 +189,29 @@
         </div>
     {{ form_end(form) }}
 </div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateTotal() {
+        var productSelect = document.getElementById('order_product');
+        var quantityInput = document.getElementById('order_quantity');
+        var totalDisplay = document.getElementById('order_totalPrice_display');
+        if (!productSelect || !quantityInput || !totalDisplay) return;
+        var price = parseFloat(productSelect.selectedOptions[0].dataset.price || 0) || 0;
+        var qty = parseInt(quantityInput.value, 10) || 0;
+        var total = price * qty;
+        // Format to 2 decimal places and use locale grouping
+        totalDisplay.value = total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    var prod = document.getElementById('order_product');
+    var qty = document.getElementById('order_quantity');
+    if (prod) prod.addEventListener('change', updateTotal);
+    if (qty) qty.addEventListener('input', updateTotal);
+    updateTotal();
+});
+</script>
 {% endblock %}

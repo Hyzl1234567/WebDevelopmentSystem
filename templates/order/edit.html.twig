@@ -205,7 +205,7 @@
     {{ form_end(form) }}
 
     {# Delete form MUST be outside the update form #}
-    {% set canDelete = is_granted('ROLE_ADMIN') or (order.createdBy and order.createdBy.id == app.user.id) %}
+    {% set canDelete = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
     
     {% if canDelete %}
         <div class="form-actions" style="margin-top: 20px; border-top: 2px dashed #e0e0e0; padding-top: 20px;">

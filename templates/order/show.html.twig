@@ -315,7 +315,7 @@
             ← Back to Orders
         </a>
         
-        {% set canEdit = is_granted('ROLE_ADMIN') or (order.createdBy and order.createdBy.id == app.user.id) %}
+        {% set canEdit = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
         
         {% if canEdit %}
             <a href="{{ path('app_order_edit', {'id': order.id}) }}" class="btn btn-warning">

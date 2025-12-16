@@ -220,7 +220,7 @@
         <div class="product-actions">
             <a href="{{ path('app_product_index') }}" class="back-btn">⬅ Back</a>
             
-            {% set canEdit = is_granted('ROLE_ADMIN') or (product.createdBy and product.createdBy.id == app.user.id) %}
+            {% set canEdit = is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
             
             {% if canEdit %}
                 <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="edit-btn">✏ Edit</a>
